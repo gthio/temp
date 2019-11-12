@@ -1,5 +1,13 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
+# %% Change working directory from the workspace root to the ipynb file location. Turn this addition off with the DataScience.changeDirOnImportExport setting
+# ms-python.python added
+import os
+try:
+	os.chdir(os.path.join(os.getcwd(), '..\\..\..\..\AppData\Local\Temp'))
+	print(os.getcwd())
+except:
+	pass
 # %%
 
 
@@ -1770,17 +1778,19 @@ plot_pca_smarter2(df_clean_norm_train,
 #  # Model engineering
 #  ---
 # 
-#  - Model A
-#      - Stochastic Gradient Descent
 # 
+# %% [markdown]
+# ## Stochastic Gradient Descent regressor
 
 # %%
 model_number_of_features = 38
 model_validation_size = 0.25
+model_seed = 2
+
 model_iteration_max = 2500
 model_tollerance = 0.0005
 model_alpha = 0.1
-model_seed = 2
+
 model_cv = 5
 
 
@@ -1800,16 +1810,6 @@ X_train, X_validation, y_train, y_validation = train_test_split(
     y, 
     test_size=model_validation_size, 
     random_state=model_seed)
-
-
-# %%
-# ... test data
-
-X_test = df_clean_norm_test[features]
-X_test.loc[:, 'Id'] = df_clean_norm_test.loc[:, 'Id']
-
-#X_test.reset_index(drop=True, inplace=True)
-X_test.set_index("Id", drop=True, inplace=True)
 
 
 # %%
@@ -1891,102 +1891,23 @@ result = {
 
 pd.DataFrame(result)
 
+# %% [markdown]
+# ### Fine tuning
 
 # %%
-# Grid search - this will take about 1 minute.
-param_grid = {
-    'my_sgd__learning_rate': ['constant', 'optimal', 'invscaling'],
-    'my_sgd__eta0': [0.001, 0.01, 0.1, 1, 10]
+# fine tune learning rate
+
+tuning_param_grid = {
 }
 
-clf = GridSearchCV(model, param_grid)
-clf.fit(X_train, y_train.values.ravel())
-
-print("Best score: " + str(clf.best_score_))
-print(clf.best_params_)
-#pd.DataFrame(clf.cv_results_)
-
-
-# %%
-
-
-
-# %%
-# Grid search - this will take about 1 minute.
-param_grid = {
-    'my_sgd__learning_rate': ['optimal'],
-    'my_sgd__eta0': [0.001],
-    'my_sgd__penalty': [ 'none', 'l2', 'l1', 'elasticnet' ],
-    'my_sgd__l1_ratio': [ 0, 0.15, 0.5, 0.85, 1.0]
-}
-
-clf = GridSearchCV(model, param_grid)
-clf.fit(X_train, y_train.values.ravel())
-
-print("Best score: " + str(clf.best_score_))
-print(clf.best_params_)
-#pd.DataFrame(clf.cv_results_)
-
-
-# %%
-# Grid search - this will take about 1 minute.
-param_grid = {
-    'my_sgd__learning_rate': ['optimal'],
-    'my_sgd__eta0': [0.001],
-    'my_sgd__penalty': [ 'elasticnet' ],
-    'my_sgd__l1_ratio': [ 0, 0.15, 0.5, 0.85, 1.0],
-
-    'my_sgd__alpha': np.arange(0.004, 0.016, 0.002),
-    'my_sgd__l1_ratio': [ 0, 0.15, 0.5, 0.85, 1.0, 0.4, 0.6, 0.02]
-
-}
-
-clf = GridSearchCV(model, param_grid)
-clf.fit(X_train, y_train.values.ravel())
-
-print("Best score: " + str(clf.best_score_))
-print(clf.best_params_)
-#pd.DataFrame(clf.cv_results_)
-
-
-# %%
-# Grid search - this will take about 1 minute.
-param_grid = {
-    'my_sgd__alpha': [0.001, 0.1],
-    'my_sgd__average': [True, False],
-    'my_sgd__shuffle': [True, False],
-    'my_sgd__max_iter': [2500],
-    'my_sgd__loss': ['squared_loss', 'huber'],
-    'my_sgd__penalty': ['l2', 'l1', 'elasticnet'],
-    'my_sgd__learning_rate': ['constant', 'optimal', 'invscaling'],
-    'my_sgd__eta0': [0.1, 0.01, 0.001]
-}
-
-clf = GridSearchCV(model, param_grid)
-clf.fit(X_train, y_train.values.ravel())
-
-print("Best score: " + str(clf.best_score_))
-print(clf.best_params_)
-#pd.DataFrame(clf.cv_results_)
-
-
-# %%
-# build pipeline
-
-pipeline = Pipeline(
+tuning_pipeline = Pipeline(
     steps = [
         ('my_scale', StandardScaler()),
-        ('my_sgd', SGDRegressor(random_state=model_seed, max_iter=model_iteration_max, tol=model_tollerance, 
-                                alpha=0.014, l1_ratio=0.02, penalty='elasticnet', learning_rate='optimal',
-                                eta0= 0.001)) 
+        ('my_sgd', SGDRegressor(random_state=model_seed, max_iter=model_iteration_max, tol=model_tollerance, alpha=model_alpha)) 
             ])
 
-
-# %%
-# fit model
-
-cv_results = cross_validate(
-    pipeline, 
+tuning_cv_results = cross_validate(
+    tuning_pipeline, 
     X_train, 
     y_train.values.ravel(), 
     cv=model_cv, 
@@ -1994,50 +1915,18 @@ cv_results = cross_validate(
     return_train_score=True, 
     return_estimator=True)
 
-cv_results
+tuning_model = tuning_cv_results['estimator'][0]
 
+clf = GridSearchCV(tuning_model, tuning_param_grid, n_jobs=4)
+clf.fit(X_train, y_train.values.ravel())
 
-# %%
-# get model with highest validation score ('test_score')
-model = cv_results['estimator'][0]
-
-
-# %%
-# get prediction 
-y_pred = model.predict(X_validation)
-
-
-# %%
-# compute model evaluation metrices
-
-mse = mean_squared_error(y_validation, y_pred)
-mae = mean_absolute_error(y_validation, y_pred)
-rmse = np.sqrt(mse)
-r2 = r2_score(y_validation, y_pred)
-
-result = {
-    'metric': ['MSE', 'MAE', 'RMSE', 'R2'], 
-    'value': [mse, mae, rmse, r2]
-}
-
-#pd.DataFrame(result)
+print("Best score: " + str(clf.best_score_))
+print(clf.best_params_)
+#pd.DataFrame(clf.cv_results_)
 
 
 # %%
 
-
-
-# %%
-# model result
-
-print(model.named_steps['my_sgd'].intercept_)
-
-result = {
-    'feature': features,
-    'coef': model.named_steps['my_sgd'].coef_
-}
-
-pd.DataFrame(result)
 
 
 # %%
@@ -2074,10 +1963,6 @@ plt.ylabel('Frequency')
 
 
 # %%
-
-
-
-# %%
 plt.plot([0, 450000], [0, 450000], '--r')
 plt.scatter(y_validation[0:size], y_pred[0:size])
 
@@ -2088,27 +1973,16 @@ plt.tick_params(axis='y')
 
 
 # %%
-# Grid search - this will take about 1 minute.
-param_grid = {
-    'my_sgd__alpha': [0.001, 0.1],
-    'my_sgd__average': [True, False],
-    'my_sgd__shuffle': [True, False],
-    'my_sgd__max_iter': [2500],
-    'my_sgd__loss': ['squared_loss', 'huber'],
-    'my_sgd__penalty': ['l2', 'l1', 'elasticnet'],
-    'my_sgd__learning_rate': ['constant', 'optimal', 'invscaling'],
-    'my_sgd__eta0': [0.1, 0.01, 0.001]
+# model result
+
+print(model.named_steps['my_sgd'].intercept_)
+
+result = {
+    'feature': features,
+    'coef': model.named_steps['my_sgd'].coef_
 }
 
-#clf = GridSearchCV(model, param_grid)
-#clf.fit(X_train, y_train.values.ravel())
-
-
-# %%
-#print("Best score: " + str(clf.best_score_))
-#print(clf.best_params_)
-
-#pd.DataFrame(clf.cv_results_)
+pd.DataFrame(result)
 
 
 # %%
@@ -2117,6 +1991,24 @@ param_grid = {
 
 # %%
 
+
+
+# %%
+
+
+
+# %%
+
+
+
+# %%
+# ... test data
+
+X_test = df_clean_norm_test[features]
+X_test.loc[:, 'Id'] = df_clean_norm_test.loc[:, 'Id']
+
+#X_test.reset_index(drop=True, inplace=True)
+X_test.set_index("Id", drop=True, inplace=True)
 
 
 # %%
