@@ -1015,6 +1015,12 @@ plot_attribute_categorical(df_raw_train, target[0], 'MoSold')
 # %%
 
 
+
+# %%
+#with pd.ExcelWriter('output.xlsx') as writer:
+#    df_raw_train.to_excel(writer, sheet_name='train')
+#    df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
+
 # %% [markdown]
 #  ## Data as it is - numeric correlation
 
@@ -1130,16 +1136,23 @@ def data_derive_attributes(df):
     
     df['d_HasPool'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
     df['d_HasGarage'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
-    df['d_HasBsmt'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
     
     df['d_Bath'] = df['FullBath'] + df['BsmtFullBath'] + (0.5 * df['HalfBath']) + (0.5 * df['BsmtHalfBath'])
     df['d_TotalPorchSF'] = df['OpenPorchSF'] + df['EnclosedPorch'] + df['3SsnPorch'] + df['ScreenPorch'] + df['WoodDeckSF'] 
     # total floor sqf
-    df['d_TotalFlrSF'] = df['1stFlrSF'] + df['2ndFlrSF']
 
-    df['d_building_land'] = df['d_TotalFlrSF'] / df['LotArea']
     
+    df['d_HasBsmt'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
+    df['d_Has2ndFlr'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
     
+    #TEMP
+    df.loc[df['TotalBsmtSF'].isnull() == True, ['TotalBsmtSF']] = 0
+    df.loc[df['1stFlrSF'].isnull() == True, ['1stFlrSF']] = 0
+    df.loc[df['2ndFlrSF'].isnull() == True, ['2ndFlrSF']] = 0
+
+    df['d_TotalFlrSF'] = df['1stFlrSF'] + df['2ndFlrSF']
+    df['d_TotalBldgSF'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
+    df['d_GardenSF'] = df['LotArea'] - df['1stFlrSF']
     
 data_derive_attributes(df_base_train) 
 data_derive_attributes(df_base_test) 
@@ -1966,8 +1979,8 @@ plt.ylabel('Frequency')
 plt.plot([0, 450000], [0, 450000], '--r')
 plt.scatter(y_validation[0:size], y_pred[0:size])
 
-plt.xlabel('Pred', size=15)
-plt.ylabel('Act', size=15)
+plt.xlabel('Prediction', size=15)
+plt.ylabel('Actual', size=15)
 plt.tick_params(axis='x')
 plt.tick_params(axis='y')
 
