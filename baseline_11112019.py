@@ -1117,6 +1117,48 @@ df_base_test = df_raw_test.copy(deep=True)
 # %%
 
 
+
+# %%
+# handler for missing data
+
+def data_missing_handler(df):
+
+    # set MasVnrArea 0 if its null
+    set_missing_data_with_value(df, 'MasVnrArea', 0)
+
+    # set MasVnrArea 0 if its null
+    set_missing_data_with_value(df, 'GarageCars', 0)    
+
+    # set MasVnrArea 0 if its null
+    set_missing_data_with_value(df, 'FullBath', 1)
+    set_missing_data_with_value(df, 'BsmtFullBath', 1)
+    set_missing_data_with_value(df, 'HalfBath', 1)
+    set_missing_data_with_value(df, 'BsmtHalfBath', 1)
+    
+    # set MasVnrArea 0 if its null
+    set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
+    
+    # set MasVnrArea 0 if its null
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
+    set_missing_data_with_value(df, '1stFlrSF', 0)
+    set_missing_data_with_value(df, '2ndFlrSF', 0)
+    
+
+
+    
+    
+    # set LotFrontage to most frequent value if its null
+    set_missing_data_with_freq_value(df, 'LotFrontage')
+    
+    # set TotalBsmtSF to most frequent value if its null
+    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+   
+    # set GarageYrBlt to YearBuilt if its null
+    df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
+
+data_missing_handler(df_base_train)
+data_missing_handler(df_base_test)
+
 # %% [markdown]
 #  ### Derives attribute(s)
 
@@ -1132,24 +1174,19 @@ def data_derive_attributes(df):
     # just take the age as renovation age
     df['d_Age'] = df['d_RemodAge']
         
-    df['d_HasFireplace'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)
-    
+    df['d_HasFireplace'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)    
     df['d_HasPool'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
-    df['d_HasGarage'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
     
     df['d_Bath'] = df['FullBath'] + df['BsmtFullBath'] + (0.5 * df['HalfBath']) + (0.5 * df['BsmtHalfBath'])
     df['d_TotalPorchSF'] = df['OpenPorchSF'] + df['EnclosedPorch'] + df['3SsnPorch'] + df['ScreenPorch'] + df['WoodDeckSF'] 
     # total floor sqf
 
+    df['d_HasGarage'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
+    
     
     df['d_HasBsmt'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
     df['d_Has2ndFlr'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
     
-    #TEMP
-    df.loc[df['TotalBsmtSF'].isnull() == True, ['TotalBsmtSF']] = 0
-    df.loc[df['1stFlrSF'].isnull() == True, ['1stFlrSF']] = 0
-    df.loc[df['2ndFlrSF'].isnull() == True, ['2ndFlrSF']] = 0
-
     df['d_TotalFlrSF'] = df['1stFlrSF'] + df['2ndFlrSF']
     df['d_TotalBldgSF'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
     df['d_GardenSF'] = df['LotArea'] - df['1stFlrSF']
@@ -1274,8 +1311,8 @@ def data_numeric_encoding(df):
         {'Pave':2, 'Grvl':1})    
 
     # numeric encoding - PoolQC
-    df['PoolQC_Encoded'] = df['PoolQC'].map( 
-        {'Ex':4, 'Gd':3, 'Fa':2, np.NaN:1})   
+    #df['PoolQC_Encoded'] = df['PoolQC'].map( 
+    #    {'Ex':4, 'Gd':3, 'Fa':2, np.NaN:1})   
     
     # numeric encoding - LotShape
     df['LotShape_Encoded'] = df['LotShape'].map( 
@@ -1385,7 +1422,7 @@ def data_numeric_encoding_missing(df):
     set_missing_data_with_freq_value(df, 'BsmtExposure_Encoded')
     
     # impute missing encoded data - PoolQC_Encoded
-    set_missing_data_with_freq_value(df, 'PoolQC_Encoded')
+    #set_missing_data_with_freq_value(df, 'PoolQC_Encoded')
         
     # impute missing encoded data - ExterQual_Encoded
     set_missing_data_with_freq_value(df, 'ExterQual_Encoded')
@@ -1440,8 +1477,8 @@ def data_missing_handler(df):
     
     
 
-data_missing_handler(df_base_train)
-data_missing_handler(df_base_test)
+#data_missing_handler(df_base_train)
+#data_missing_handler(df_base_test)
 
 
 # %%
@@ -1451,13 +1488,16 @@ exclusions = [#'Id',
     'd_HouseAge', 'd_RemodAge',
     'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 
     'GarageArea', 'GarageYrBlt',
-    '1stFlrSF', '2ndFlrSF', 'LowQualFinSF',
+
     'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'WoodDeckSF',
     
-    'Fireplaces', 'PoolArea',
+    'Fireplaces', 'PoolArea', 'PoolQC',
     'FullBath', 'HalfBath', 'BsmtFullBath', 'BsmtHalfBath', 
-    'BsmtFinSF1', 'BsmtFinSF2',                 
+    'BsmtFinSF1', 'BsmtFinSF2',   
+    '1stFlrSF', '2ndFlrSF', 'LowQualFinSF',
 
+    'MiscFeature', 'MiscVal', 
+    
     'TotRmsAbvGrd', 'GrLivArea'
 ] 
 
