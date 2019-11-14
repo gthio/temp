@@ -1143,9 +1143,11 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, '1stFlrSF', 0)
     set_missing_data_with_value(df, '2ndFlrSF', 0)
     
-
-
-    
+    set_missing_data_with_value(df, 'OpenPorchSF', 0)    
+    set_missing_data_with_value(df, 'EnclosedPorch', 0)    
+    set_missing_data_with_value(df, '3SsnPorch', 0)    
+    set_missing_data_with_value(df, 'ScreenPorch', 0)    
+    set_missing_data_with_value(df, 'WoodDeckSF', 0)
     
     # set LotFrontage to most frequent value if its null
     set_missing_data_with_freq_value(df, 'LotFrontage')
@@ -1201,10 +1203,10 @@ data_derive_attributes(df_base_test)
 def data_derive_neighborhood_code(df):
     
     # get new dataframe for temp processing
-    df_temp = df_base_train[['Neighborhood', 'SalePrice', 'd_TotalFlrSF']].copy(deep=True)
+    df_temp = df_base_train[['Neighborhood', 'SalePrice', 'd_TotalBldgSF']].copy(deep=True)
 
     # compute psf, price per sequare feet
-    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['d_TotalFlrSF']
+    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['d_TotalBldgSF']
 
     # compute psf for each Neighborhood
     df_temp_group = df_temp.groupby(['Neighborhood'], as_index=False).agg({"d_PricePerSF": [np.mean, np.median]})
@@ -1943,6 +1945,8 @@ result = {
 }
 
 pd.DataFrame(result)
+
+#8.934228e-01
 
 # %% [markdown]
 # ### Fine tuning
