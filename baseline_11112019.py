@@ -51,6 +51,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.style as style
 import seaborn as sns
+from datetime import datetime
 
 from scipy import stats
 
@@ -1115,10 +1116,6 @@ df_base_test = df_raw_test.copy(deep=True)
 
 
 # %%
-
-
-
-# %%
 # handler for missing data
 
 def data_missing_handler(df):
@@ -1130,10 +1127,10 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, 'GarageCars', 0)    
 
     # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'FullBath', 1)
-    set_missing_data_with_value(df, 'BsmtFullBath', 1)
-    set_missing_data_with_value(df, 'HalfBath', 1)
-    set_missing_data_with_value(df, 'BsmtHalfBath', 1)
+    set_missing_data_with_value(df, 'FullBath', 0)
+    set_missing_data_with_value(df, 'BsmtFullBath', 0)
+    set_missing_data_with_value(df, 'HalfBath', 0)
+    set_missing_data_with_value(df, 'BsmtHalfBath', 0)
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
@@ -1150,7 +1147,11 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, 'WoodDeckSF', 0)
     
     # set LotFrontage to most frequent value if its null
-    set_missing_data_with_freq_value(df, 'LotFrontage')
+    #set_missing_data_with_freq_value(df, 'LotFrontage')
+    
+    #df['LotFrontage'] = df.apply(lambda x: (x['LotArea'] * 0.001) if x['LotFrontage'].isnull() else x['LotFrontage'])    
+    
+    df.loc[df['LotFrontage'].isnull(), 'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
     
     # set TotalBsmtSF to most frequent value if its null
     set_missing_data_with_freq_value(df, 'TotalBsmtSF')
@@ -1235,6 +1236,43 @@ df_base_test = pd.merge(df_base_test,
     left_on='Neighborhood', 
     right_on='Neighborhood') 
 
+
+# %%
+# derive Neighborhood's code value based on the price per square feet
+
+def data_derive_MSSubClass_code(df):
+    
+    # get new dataframe for temp processing
+    df_temp = df_base_train[['MSSubClass', 'SalePrice', 'd_TotalBldgSF']].copy(deep=True)
+
+    # compute psf, price per sequare feet
+    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['d_TotalBldgSF']
+
+    # compute psf for each Neighborhood
+    df_temp_group = df_temp.groupby(['MSSubClass'], as_index=False).agg({"d_PricePerSF": [np.mean, np.median]})
+    df_temp_group.columns = ['_'.join(t).rstrip('_') for t in df_temp_group.columns]
+
+    # sort dataframe on psf asncending order
+    df_temp_group.sort_values(by="d_PricePerSF_median", ascending=True, inplace=True)
+
+    # set computed Neighborhood's code value
+    df_temp_group['d_MSSubClass_Code'] = df_temp_group.reset_index().index + 1
+    df_temp_group['d_MSSubClass_Code'] = df_temp_group['MSSubClass']
+    
+    return df_temp_group
+
+
+df_MSSubClass_code = data_derive_MSSubClass_code(df_base_train)
+
+dict_MSSubClass_code = df_MSSubClass_code[["MSSubClass", "d_MSSubClass_Code"]].set_index("MSSubClass")["d_MSSubClass_Code"].to_dict()
+
+df_base_train["d_MSSubClass_Code"] = df_base_train["MSSubClass"].apply(lambda x: dict_MSSubClass_code.get(x, None))
+df_base_test["d_MSSubClass_Code"] = df_base_test["MSSubClass"].apply(lambda x: dict_MSSubClass_code.get(x, None))
+
+
+# %%
+dict_MSSubClass_code
+
 # %% [markdown]
 #  #### One-hot encoding
 
@@ -1272,6 +1310,11 @@ df_base_train
 # %%
 def data_numeric_encoding(df):
 
+    # numeric encoding - GarageQual
+    #df['OverallCond_Encoded'] = df['OverallCond'].map( 
+    #    {10:4, 9:4, 8:4, 7:3, 6:3, 5:2, 4:2, 3:2, 2:1, 1:1})    
+    
+    
     # numeric encoding - GarageQual
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
         {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
@@ -1436,9 +1479,10 @@ def data_numeric_encoding_missing(df):
     set_missing_data_with_freq_value(df, 'Foundation_Encoded')        
 
     # impute missing encoded data - MSZoning
-    set_missing_data_with_freq_value(df, 'MSZoning_Encoded')   
-
-
+    set_missing_data_with_freq_value(df, 'MSZoning_Encoded')  
+    
+    # impute missing encoded data - MSZoning
+    set_missing_data_with_freq_value(df, 'd_MSSubClass_Code')  
     
 data_numeric_encoding_missing(df_base_train)
 data_numeric_encoding_missing(df_base_test)
@@ -1500,7 +1544,11 @@ exclusions = [#'Id',
 
     'MiscFeature', 'MiscVal', 
     
-    'TotRmsAbvGrd', 'GrLivArea'
+    'TotRmsAbvGrd', 'GrLivArea',
+    
+    'MSSubClass'
+    
+    #'OverallCond'
 ] 
 
 df_base_train = df_base_train.drop(exclusions, axis=1, errors='ignore')
@@ -1608,14 +1656,14 @@ plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
-attribute = 'd_TotalFlrSF'
+attribute = 'd_TotalBldgSF'
 
 plot_attribute_chart(df_base_train, attribute)
 plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
-attribute = 'TotalBsmtSF'
+attribute = 'd_TotalFlrSF'
 
 plot_attribute_chart(df_base_train, attribute)
 plot_attribute_chart(df_clean_outlier_train, attribute)
@@ -1691,7 +1739,7 @@ numeric_attributes = list(set(numeric_attributes) - set(variable_ignored) - set(
 
 
 # %%
-df_clean_norm_train_meta
+len(numeric_attributes)
 
 
 # %%
@@ -1851,7 +1899,8 @@ model_cv = 5
 
 # %%
 # get model features, from the top x attributes with highest k-best score
-features = df_attribute_scores.iloc[0:model_number_of_features, 0]
+features = df_attribute_scores.iloc[0:model_number_of_features].sort_values(
+    by='kbest', ascending=False)['attribute']
 
 
 # %%
@@ -2087,7 +2136,15 @@ zz[['Id', 'SalePrice']].to_csv('submission.csv',index=False)
 
 
 # %%
+now = datetime.now()
 
+with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writer:
+    df_raw_train.to_excel(writer, sheet_name='train')
+    df_raw_train_meta_sorted.to_excel(writer, sheet_name='train_corr')
+    df_base_train.to_excel(writer, sheet_name='train_base')
+    df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
+    df_clean_outlier_train.to_excel(writer, sheet_name='train_clean')
+    df_clean_outlier_train_meta_sorted.to_excel(writer, sheet_name='train_clean_corr')
 
 
 # %%
