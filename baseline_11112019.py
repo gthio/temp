@@ -185,17 +185,21 @@ def get_stat_quart(x):
     
     upper1 = float('nan'); lower1 = float('nan')
     upper2 = float('nan'); lower2 = float('nan')
-    upper3 = float('nan'); lower3 = float('nan')    
+    upper3 = float('nan'); lower3 = float('nan') 
+    upper4 = float('nan'); lower4 = float('nan') 
+    upper5 = float('nan'); lower5 = float('nan') 
 
     if ((x['dtype'] == 'int64') | (x['dtype'] == 'float64')):
         mean = x['mean']
         stddev = x['std']
 
+        lower5 = mean - (stddev * 5); upper5 = mean + (stddev * 5)
+        lower4 = mean - (stddev * 4); upper4 = mean + (stddev * 4)
         lower3 = mean - (stddev * 3); upper3 = mean + (stddev * 3)
         lower2 = mean - (stddev * 2); upper2 = mean + (stddev * 2)        
         lower1 = mean - (stddev * 1); upper1 = mean + (stddev * 1)        
         
-    return [lower1, upper1, lower2, upper2, lower3, upper3]
+    return [lower1, upper1, lower2, upper2, lower3, upper3, lower4, upper4, lower5, upper5]
 
 
 # %%
@@ -218,7 +222,9 @@ def set_stat(df_data, df_meta):
     # set each attribute's 3rd, 2nd and 1st quartile deviation
     df_meta[['lower_3s_1', 'upper_3s_1', 
              'lower_3s_2', 'upper_3s_2', 
-             'lower_3s_3', 'upper_3s_3']] = df_meta.loc[:, :].apply(
+             'lower_3s_3', 'upper_3s_3',
+             'lower_3s_4', 'upper_3s_4',
+             'lower_3s_5', 'upper_3s_5']] = df_meta.loc[:, :].apply(
         lambda x: get_stat_quart(x), axis=1, result_type="expand")
     
 
@@ -489,6 +495,12 @@ df_raw_test.head(config_df_row_count)
 # get train data metadata
 df_raw_train_meta = get_dataframe_metadata(df_raw_train)
 df_raw_train_meta.head(config_df_row_count)
+
+
+# %%
+# get test data metadata
+df_raw_test_meta = get_dataframe_metadata(df_raw_test)
+df_raw_test_meta.head(config_df_row_count)
 
 
 # %%
@@ -1154,7 +1166,8 @@ def data_missing_handler(df):
     df.loc[df['LotFrontage'].isnull(), 'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
     
     # set TotalBsmtSF to most frequent value if its null
-    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
    
     # set GarageYrBlt to YearBuilt if its null
     df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
@@ -1309,27 +1322,18 @@ df_base_train
 
 # %%
 def data_numeric_encoding(df):
-
-    # numeric encoding - GarageQual
-    #df['OverallCond_Encoded'] = df['OverallCond'].map( 
-    #    {10:4, 9:4, 8:4, 7:3, 6:3, 5:2, 4:2, 3:2, 2:1, 1:1})    
-    
     
     # numeric encoding - GarageQual
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
-        {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
-    
-    # numeric encoding - BsmtCond
-    ##df['BsmtCond_Encoded'] = df['BsmtCond'].map( 
-    ##    {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})    
+        {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2.1})
     
     # numeric encoding - BsmtExposure
     df['BsmtExposure_Encoded'] = df['BsmtExposure'].map( 
-        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1})         
+        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1.1})         
     
     # numeric encoding - ExterQual
     df['ExterQual_Encoded'] = df['ExterQual'].map( 
-        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1})
+        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1})
 
     # numeric encoding - ExterCond
     df['ExterCond_Encoded'] = df['ExterCond'].map( 
@@ -1341,7 +1345,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - CentralAir
     df['Electrical_Encoded'] = df['Electrical'].map( 
-        {'SBrkr':3, 'FuseA':2, 'FuseF':2, 'FuseP':2, 'Mix':1, np.NaN:3})       
+        {'SBrkr':3, 'FuseA':2, 'FuseF':2, 'FuseP':2, 'Mix':1, np.NaN:3.1})       
     
     # numeric encoding - KitchenQual
     df['KitchenQual_Encoded'] = df['KitchenQual'].map( 
@@ -1352,36 +1356,28 @@ def data_numeric_encoding(df):
         {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1})   
     
     # numeric encoding - Alley
-    df['Alley_Encoded'] = df['Alley'].map( 
-        {'Pave':2, 'Grvl':1})    
-
-    # numeric encoding - PoolQC
-    #df['PoolQC_Encoded'] = df['PoolQC'].map( 
-    #    {'Ex':4, 'Gd':3, 'Fa':2, np.NaN:1})   
+    #df['Alley_Encoded'] = df['Alley'].map( 
+    #    {'Pave':2, 'Grvl':1})    
     
     # numeric encoding - LotShape
     df['LotShape_Encoded'] = df['LotShape'].map( 
         {'Reg':2, 'IR1':1, 'IR2':1, 'IR3':1})
 
     # numeric encoding - LandSlope - XXX
-    df['LandSlope_Encoded'] = df['LandSlope'].map( 
-        {'Gtl':3, 'Mod':2, 'Sev':1})
+    #df['LandSlope_Encoded'] = df['LandSlope'].map( 
+    #    {'Gtl':3, 'Mod':2, 'Sev':1})
 
     # numeric encoding - GarageFinish
     df['GarageFinish_Encoded'] = df['GarageFinish'].map( 
-        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 0})    
+        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 2.1})    
     
     # numeric encoding - GarageQual
     df['GarageQual_Encoded'] = df['GarageQual'].map( 
-        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})
+        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 1.1})
     
     # numeric encoding - GarageQual
     df['GarageType_Encoded'] = df['GarageType'].map( 
-        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 0})    
-    
-    # numeric encoding - GarageCond XXX
-    ##df['GarageCond_Encoded'] = df['GarageCond'].map( 
-    ##    {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, 'NA':np.NaN})
+        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 1.1})    
     
     # numeric encoding - Foundation
     df['Foundation_Encoded'] = df['Foundation'].map( 
@@ -1389,7 +1385,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - Foundation
     df['MasVnrType_Encoded'] = df['MasVnrType'].map( 
-        {'Stone':4, 'BrkFace':3, 'None':2, 'BrkCmn':1, np.NaN: 1 })
+        {'Stone':4, 'BrkFace':3, 'None':2, 'BrkCmn':1, np.NaN: 2.1 })
 
     # numeric encoding - Paved drive
     df['PavedDrive_Encoded'] = df['PavedDrive'].map( 
@@ -1397,12 +1393,8 @@ def data_numeric_encoding(df):
     
     # numeric encoding - MSZoning
     df['MSZoning_Encoded'] = df['MSZoning'].map( 
-        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 1 })     
+        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 1.1 })     
     
-    # numeric encoding - OverallQual
-    #df['OverallQual_Encoded'] = df['OverallQual'].map( 
-    #    {'0':4, '1':4, '2':4, '3':4, '4':4, '5':5, '6':6, '7':7, '8':8, '9':8, '10':8 })      
-
 data_numeric_encoding(df_base_train)
 data_numeric_encoding(df_base_test)
 
@@ -1434,10 +1426,10 @@ def data_numeric_encoding_missing(df):
     set_missing_data_with_freq_value(df, 'LotShape_Encoded')
 
     # impute missing encoded data - Alley_Encoded
-    set_missing_data_with_freq_value(df, 'Alley_Encoded')
+    #set_missing_data_with_freq_value(df, 'Alley_Encoded')
 
     # impute missing encoded data - LandSlope_Encoded xxx
-    set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
+    #set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
 
     # impute missing encoded data - CentralAir_Encoded
     set_missing_data_with_freq_value(df, 'CentralAir_Encoded')
@@ -1516,7 +1508,8 @@ def data_missing_handler(df):
     set_missing_data_with_freq_value(df, 'LotFrontage')
     
     # set TotalBsmtSF to most frequent value if its null
-    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
    
     # set GarageYrBlt to YearBuilt if its null
     df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
@@ -1886,7 +1879,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # ## Stochastic Gradient Descent regressor
 
 # %%
-model_number_of_features = 38
+model_number_of_features = 40
 model_validation_size = 0.25
 model_seed = 2
 
@@ -1997,6 +1990,7 @@ pd.DataFrame(result)
 
 #8.934228e-01
 #8.943792e-01
+#8.971829e-01
 
 # %% [markdown]
 # ### Fine tuning
@@ -2141,7 +2135,10 @@ now = datetime.now()
 
 with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writer:
     df_raw_train.to_excel(writer, sheet_name='train')
-    df_raw_train_meta_sorted.to_excel(writer, sheet_name='train_corr')
+    df_raw_test.to_excel(writer, sheet_name='test')
+    df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
+    df_raw_test_meta.to_excel(writer, sheet_name='test_meta')
+    
     df_base_train.to_excel(writer, sheet_name='train_base')
     df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
     df_clean_outlier_train.to_excel(writer, sheet_name='train_clean')
