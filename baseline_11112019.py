@@ -351,7 +351,7 @@ def get_df_meta_by_correlation(df_corr, df_meta, target):
         df_meta, 
         left_index=True, 
         right_index=True, 
-        how='inner').sort_values(by=column_name, ascending=False)
+        how='right').sort_values(by=column_name, ascending=False)
     
     return result
 
@@ -371,7 +371,7 @@ def get_df_meta_by_correlation2(df_corr, df_meta, target):
         df_meta, 
         left_index=True, 
         right_index=True, 
-        how='inner').sort_values(by=column_name_abs, ascending=False)
+        how='right').sort_values(by=column_name_abs, ascending=False)
     
     return result
 
@@ -1146,9 +1146,9 @@ def data_missing_handler(df):
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
     
     # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
     set_missing_data_with_value(df, '1stFlrSF', 0)
     set_missing_data_with_value(df, '2ndFlrSF', 0)
     
@@ -1158,17 +1158,9 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, 'ScreenPorch', 0)    
     set_missing_data_with_value(df, 'WoodDeckSF', 0)
     
-    # set LotFrontage to most frequent value if its null
-    #set_missing_data_with_freq_value(df, 'LotFrontage')
-    
-    #df['LotFrontage'] = df.apply(lambda x: (x['LotArea'] * 0.001) if x['LotFrontage'].isnull() else x['LotFrontage'])    
-    
+
     df.loc[df['LotFrontage'].isnull(), 'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
     
-    # set TotalBsmtSF to most frequent value if its null
-    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
-   
     # set GarageYrBlt to YearBuilt if its null
     df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
 
@@ -1182,30 +1174,30 @@ data_missing_handler(df_base_test)
 def data_derive_attributes(df):
     
     # age of the house
-    df['d_HouseAge'] = (df['YrSold'] + (df['MoSold'] / 12)) - df['YearBuilt']
+    df['HouseAge_Derived'] = (df['YrSold'] + (df['MoSold'] / 12)) - df['YearBuilt']
 
     # number of years since last renovation
-    df['d_RemodAge'] = (df['YrSold'] + (df['MoSold'] / 12)) - df['YearRemodAdd']
+    df['RemodAge_Derived'] = (df['YrSold'] + (df['MoSold'] / 12)) - df['YearRemodAdd']
 
     # just take the age as renovation age
-    df['d_Age'] = df['d_RemodAge']
+    df['Age_Derived'] = df['RemodAge_Derived']
         
-    df['d_HasFireplace'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)    
-    df['d_HasPool'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
+    df['Fireplace_Has_Derived'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)    
+    df['HasPool_Has_Derived'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
     
-    df['d_Bath'] = df['FullBath'] + df['BsmtFullBath'] + (0.5 * df['HalfBath']) + (0.5 * df['BsmtHalfBath'])
-    df['d_TotalPorchSF'] = df['OpenPorchSF'] + df['EnclosedPorch'] + df['3SsnPorch'] + df['ScreenPorch'] + df['WoodDeckSF'] 
+    df['Bath_Derived'] = df['FullBath'] + df['BsmtFullBath'] + (0.5 * df['HalfBath']) + (0.5 * df['BsmtHalfBath'])
+    df['TotalPorchSF_Derived'] = df['OpenPorchSF'] + df['EnclosedPorch'] + df['3SsnPorch'] + df['ScreenPorch'] + df['WoodDeckSF'] 
     # total floor sqf
 
-    df['d_HasGarage'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
+    df['Garage_Has_Derived'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
     
     
-    df['d_HasBsmt'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
-    df['d_Has2ndFlr'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
+    df['Bsmt_Has_Derived'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
+    df['2ndFlr_Has_Derived'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
     
-    df['d_TotalFlrSF'] = df['1stFlrSF'] + df['2ndFlrSF']
-    df['d_TotalBldgSF'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
-    df['d_GardenSF'] = df['LotArea'] - df['1stFlrSF']
+    df['TotalFlrSF_Derived'] = df['1stFlrSF'] + df['2ndFlrSF']
+    df['TotalBldgSF_Derived'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
+    df['GardenSF_Derived'] = df['LotArea'] - df['1stFlrSF']
     
 data_derive_attributes(df_base_train) 
 data_derive_attributes(df_base_test) 
@@ -1217,10 +1209,10 @@ data_derive_attributes(df_base_test)
 def data_derive_neighborhood_code(df):
     
     # get new dataframe for temp processing
-    df_temp = df_base_train[['Neighborhood', 'SalePrice', 'd_TotalBldgSF']].copy(deep=True)
+    df_temp = df_base_train[['Neighborhood', 'SalePrice', 'TotalBldgSF_Derived']].copy(deep=True)
 
     # compute psf, price per sequare feet
-    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['d_TotalBldgSF']
+    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['TotalBldgSF_Derived']
 
     # compute psf for each Neighborhood
     df_temp_group = df_temp.groupby(['Neighborhood'], as_index=False).agg({"d_PricePerSF": [np.mean, np.median]})
@@ -1256,10 +1248,10 @@ df_base_test = pd.merge(df_base_test,
 def data_derive_MSSubClass_code(df):
     
     # get new dataframe for temp processing
-    df_temp = df_base_train[['MSSubClass', 'SalePrice', 'd_TotalBldgSF']].copy(deep=True)
+    df_temp = df_base_train[['MSSubClass', 'SalePrice', 'TotalBldgSF_Derived']].copy(deep=True)
 
     # compute psf, price per sequare feet
-    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['d_TotalBldgSF']
+    df_temp['d_PricePerSF'] = df_base_train['SalePrice'] / df_base_train['TotalBldgSF_Derived']
 
     # compute psf for each Neighborhood
     df_temp_group = df_temp.groupby(['MSSubClass'], as_index=False).agg({"d_PricePerSF": [np.mean, np.median]})
@@ -1401,10 +1393,6 @@ data_numeric_encoding(df_base_test)
 
 # %%
 
-df_base_train['GarageArea'].unique()
-df_base_train.loc[df_base_train['GarageArea'] == 0].shape
-df_base_train.loc[df_base_train['GarageFinish'].isnull()].shape
-df_base_train.loc[df_base_train['GarageFinish_Encoded'] == 0].shape
 
 
 # %%
@@ -1494,7 +1482,7 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, 'GarageCars', 0)    
 
     # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'd_Bath', 1)
+    set_missing_data_with_value(df, 'Bath_Derived', 1)
     
     
     # set MasVnrArea 0 if its null
@@ -1524,7 +1512,7 @@ def data_missing_handler(df):
 # exclude un-used columns
 
 exclusions = [#'Id', 
-    'd_HouseAge', 'd_RemodAge',
+    'HouseAge_Derived', 'RemodAge_Derived',
     'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 
     'GarageArea', 'GarageYrBlt',
 
@@ -1619,7 +1607,7 @@ numeric_attributes = list(set(numeric_attributes) - set(variable_ignored) - set(
 
 
 # %%
-attributes = ['SalePrice', 'LotArea', 'd_TotalFlrSF', 'TotalBsmtSF'] 
+attributes = ['SalePrice', 'LotArea', 'TotalFlrSF_Derived', 'TotalBsmtSF'] 
 
 for attribute in attributes:	
 
@@ -1649,14 +1637,14 @@ plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
-attribute = 'd_TotalBldgSF'
+attribute = 'TotalBldgSF_Derived'
 
 plot_attribute_chart(df_base_train, attribute)
 plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
-attribute = 'd_TotalFlrSF'
+attribute = 'TotalFlrSF_Derived'
 
 plot_attribute_chart(df_base_train, attribute)
 plot_attribute_chart(df_clean_outlier_train, attribute)
@@ -1802,7 +1790,7 @@ plot_attribute_chart(df_clean_norm_train, attribute)
 
 
 # %%
-attribute = 'd_TotalFlrSF'
+attribute = 'TotalFlrSF_Derived'
 
 plot_attribute_chart(df_clean_outlier_train, attribute)
 plot_attribute_chart(df_clean_norm_train, attribute)
@@ -2134,10 +2122,11 @@ zz[['Id', 'SalePrice']].to_csv('submission.csv',index=False)
 now = datetime.now()
 
 with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writer:
-    df_raw_train.to_excel(writer, sheet_name='train')
-    df_raw_test.to_excel(writer, sheet_name='test')
-    df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
-    df_raw_test_meta.to_excel(writer, sheet_name='test_meta')
+    df_raw_train.to_excel(writer, sheet_name='raw_train')
+    df_raw_test.to_excel(writer, sheet_name='raw_test')
+    df_raw_train_meta.to_excel(writer, sheet_name='raw_train_meta')
+    df_raw_test_meta.to_excel(writer, sheet_name='raw_test_meta')
+    df_raw_train_meta_sorted.to_excel(writer, sheet_name='raw_train_meta_corr')
     
     df_base_train.to_excel(writer, sheet_name='train_base')
     df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
