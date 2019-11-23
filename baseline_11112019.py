@@ -15,6 +15,13 @@ except:
 # %%
 #https://medium.com/@datalesdatales/why-you-should-be-plotting-learning-curves-in-your-next-machine-learning-project-221bae60c53
 
+
+#plot_attribute_categorical_original(df_raw_train, target[0], 'ExterQual')
+
+#https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
+#https://python-graph-gallery.com/10-barplot-with-number-of-observation/
+#https://matplotlib.org/3.1.0/gallery/statistics/barchart_demo.html#sphx-glr-gallery-statistics-barchart-demo-py
+
 # %% [markdown]
 #  # Problem formulation
 #  ---
@@ -54,6 +61,7 @@ import seaborn as sns
 from datetime import datetime
 
 from scipy import stats
+import re
 
 # sklearn's pre-processing
 from sklearn.impute import SimpleImputer
@@ -84,9 +92,9 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('max_colwidth', -1)
-    
+#style="whitegrid", 
 #set pyplot and seaborn style
-sns.set(style="whitegrid", palette="deep", color_codes=True)
+sns.set(palette="pastel", color_codes=True)
 style.use('fivethirtyeight')
 
 # set seed for reproducibility
@@ -395,7 +403,104 @@ def set_missing_data_with_value(df, attribute, fill_value):
 
 
 # %%
-def plot_attribute_categorical(df, target, attribute):
+
+
+
+# %%
+
+def plot_attribute_categorical_temp(df, attribute, target):
+    
+    ax = sns.boxplot(y=attribute, x=target, 
+                     data=df)
+    
+    ax = sns.stripplot(y=attribute, x=target, 
+                       data=df, 
+                       color="orange", jitter=0.2, size=2.5)
+    
+    ax.set_ylabel('')
+    
+    plotCats = [re.split(', ', str(x).replace(')', '').replace('\'', ''))[2] for 
+                x in ax.get_yticklabels()] 
+
+    nobsx = df[attribute].value_counts(dropna=False)
+    nobs0 = nobsx.values
+    nobs = [str(x) for x in nobs0.tolist()]
+    nobs = ["n: " + i for i in nobs]
+
+    temp = {}
+    for cat in plotCats:
+        temp[cat] = nobsx[cat]
+
+    nobs = ["n: " + str(i) for i in list(temp.values())]
+
+    ax2 = ax.twinx()
+    ax2.grid(True, which='major', linestyle='--', alpha=0.35)
+    ax2.set_yticks(ax.get_yticks())
+    ax2.set_ylim(ax.get_ylim())
+    ax2.set_yticklabels(nobs) 
+    
+    # Add title and axis names
+    plt.title(attribute)
+    plt.xlabel('Sale Price')
+    plt.show()
+
+    return
+
+#plot_attribute_categorical_temp(df_raw_train, 'ExterCond', target[0])
+
+
+# %%
+
+def plot_attribute_categorical(df_o, attribute, target):
+        
+    df = df_o.copy(deep=True)
+    
+    df[attribute] = df[attribute].astype(str)
+        
+    ax = sns.boxplot(x=attribute, y=target, data=df)
+    ax = sns.stripplot(x=attribute, y=target, 
+                       data=df, 
+                       color="orange", jitter=0.2, size=2.5)
+    
+    plotCats = [re.split(', ', str(x).replace(')', '').replace('\'', ''))[2] for 
+                x in ax.get_xticklabels()] 
+
+    nobsx = df[attribute].value_counts(dropna=False)
+    nobs0 = nobsx.values
+    nobs = [str(x) for x in nobs0.tolist()]
+    nobs = ["n: " + i for i in nobs]
+  
+    temp = {}
+    temp2 = {}
+    counter = 0
+    for cat in plotCats:
+        temp2[counter] = nobsx[cat]
+        temp[cat] = nobsx[cat]
+        counter += 1
+
+    nobs = ["n: " + str(i) for i in list(temp.values())]
+    
+    # Calculate number of obs per group & median to position labels
+    medians = df.groupby([attribute])[target].max().values
+    nobs = df[attribute].value_counts()
+    #nobs = [str(x) for x in nobs.tolist()]
+    #nobs = ["n: " + i for i in nobs]
+
+    # Add it to the plot
+    pos = range(len(nobs))
+    
+    for tick,label in zip(pos,nobs):
+        ax.text(pos[tick], 800000, 'n: ' + str(temp2[tick]),
+            horizontalalignment='center', size='x-small', color='black', weight='semibold')
+        
+    return
+
+#plot_attribute_categorical_type2(df_raw_train, 'BedroomAbvGr', target[0])
+#plot_attribute_categorical_type2(df_raw_train, 'ExterCond', target[0])
+
+
+# %%
+def plot_attribute_categorical_original(df, target, attribute):
     fig, ax = plt.subplots(1, 2, figsize=(20, 5))
 
     sns.catplot(x=attribute, y=target, kind='bar', data=df_raw_train.fillna('MISSING!!'), ax=ax[0])
@@ -457,7 +562,8 @@ df_raw_test = pd.read_csv(
 
 
 # %%
-
+df_raw_train.replace(r'^\s*$', np.nan, regex=True, inplace=True)
+df_raw_test.replace(r'^\s*$', np.nan, regex=True, inplace=True)
 
 # %% [markdown]
 #  ## Data - as it is
@@ -546,31 +652,33 @@ df_raw_train_meta.loc[df_raw_train_meta.index == attribute, :]
 #  6. **RoofStyle**: Type of roof (**Flat**: Flat, **Gable**: Gable, **Gambrel**: Gabrel (Barn), **Hip**: Hip, **Mansard**: Mansard, **Shed**: Shed)
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'ExterCond')
+plot_attribute_categorical(df_raw_train, 'ExterCond', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'ExterQual')
 
-
-# %%
-plot_attribute_categorical(df_raw_train, target[0], 'Exterior1st')
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Exterior2nd')
+plot_attribute_categorical(df_raw_train, 'Exterior1st', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Fence')
+plot_attribute_categorical(df_raw_train, 'Exterior2nd', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'RoofMatl')
+
+
+plot_attribute_categorical(df_raw_train, 'Fence', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'RoofStyle')
+plot_attribute_categorical(df_raw_train, 'RoofMatl', target[0])
+
+
+# %%
+plot_attribute_categorical(df_raw_train, 'RoofStyle', target[0])
 
 
 # %%
@@ -593,27 +701,31 @@ sns.regplot(x="GarageArea", y="SalePrice", data=df_raw_train);
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageCars')
+df_raw_train['GarageCars'].unique()
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageQual')
+plot_attribute_categorical(df_raw_train, 'GarageCars', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageCond')
+plot_attribute_categorical(df_raw_train, 'GarageQual', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageFinish')
+plot_attribute_categorical(df_raw_train, 'GarageCond', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageType')
+plot_attribute_categorical(df_raw_train, 'GarageFinish', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'GarageYrBlt')
+plot_attribute_categorical(df_raw_train, 'GarageType', target[0])
+
+
+# %%
+plot_attribute_categorical(df_raw_train, 'GarageYrBlt', target[0])
 
 
 # %%
@@ -637,23 +749,23 @@ sns.regplot(x="TotalBsmtSF", y="SalePrice", data=df_raw_train);
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtQual')
+plot_attribute_categorical(df_raw_train, 'BsmtQual', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtCond')
+plot_attribute_categorical(df_raw_train, 'BsmtCond', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtExposure')
+plot_attribute_categorical(df_raw_train, 'BsmtExposure', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtFinType1')
+plot_attribute_categorical(df_raw_train, 'BsmtFinType1', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtFinType2')
+plot_attribute_categorical(df_raw_train, 'BsmtFinType2', target[0])
 
 
 # %%
@@ -678,11 +790,11 @@ sns.regplot(x="BsmtUnfSF", y="SalePrice", data=df_raw_train);
 #  2. **KitchenQual**, kitchen quality
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'KitchenAbvGr')
+plot_attribute_categorical(df_raw_train, 'KitchenAbvGr', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'KitchenQual')
+plot_attribute_categorical(df_raw_train, 'KitchenQual', target[0])
 
 
 # %%
@@ -696,11 +808,11 @@ plot_attribute_categorical(df_raw_train, target[0], 'KitchenQual')
 #  3. **GrLivArea**, Above grade (ground) living area square feet
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Fireplaces')
+plot_attribute_categorical(df_raw_train, 'Fireplaces', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'FireplaceQu')
+plot_attribute_categorical(df_raw_train, 'FireplaceQu', target[0])
 
 
 # %%
@@ -721,27 +833,27 @@ sns.regplot(x="GrLivArea", y="SalePrice", data=df_raw_train);
 #  6. **BsmtHalfBath**, basement half bathrooms
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BedroomAbvGr')
+plot_attribute_categorical(df_raw_train, 'BedroomAbvGr', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'TotRmsAbvGrd')
+plot_attribute_categorical(df_raw_train, 'TotRmsAbvGrd', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'FullBath')
+plot_attribute_categorical(df_raw_train, 'FullBath', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'HalfBath')
+plot_attribute_categorical(df_raw_train, 'HalfBath', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtFullBath')
+plot_attribute_categorical(df_raw_train, 'BsmtFullBath', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BsmtHalfBath')
+plot_attribute_categorical(df_raw_train, 'BsmtHalfBath', target[0])
 
 
 # %%
@@ -756,15 +868,15 @@ plot_attribute_categorical(df_raw_train, target[0], 'BsmtHalfBath')
 #  4. **MiscVal**: $Value of miscellaneous feature
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'PoolQC')
+plot_attribute_categorical(df_raw_train, 'PoolQC', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'PoolArea')
+plot_attribute_categorical(df_raw_train, 'PoolArea', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'MiscFeature')
+plot_attribute_categorical(df_raw_train, 'MiscFeature', target[0])
 
 
 # %%
@@ -784,23 +896,23 @@ sns.regplot(x="MiscVal", y="SalePrice", data=df_raw_train);
 #  5. **Utilities**: Type of utilities available
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Electrical')
+plot_attribute_categorical(df_raw_train, 'Electrical', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'CentralAir')
+plot_attribute_categorical(df_raw_train, 'CentralAir', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Heating')
+plot_attribute_categorical(df_raw_train, 'Heating', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'HeatingQC')
+plot_attribute_categorical(df_raw_train, 'HeatingQC', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Utilities')
+plot_attribute_categorical(df_raw_train, 'Utilities', target[0])
 
 
 # %%
@@ -813,11 +925,11 @@ plot_attribute_categorical(df_raw_train, target[0], 'Utilities')
 #  2. **OverallCond**, rates the overall condition of the house
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'OverallQual')
+plot_attribute_categorical(df_raw_train, 'OverallQual', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'OverallCond')
+plot_attribute_categorical(df_raw_train, 'OverallCond', target[0])
 
 
 # %%
@@ -845,19 +957,19 @@ plot_attribute_categorical(df_raw_train, target[0], 'OverallCond')
 # 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'BldgType')
+plot_attribute_categorical(df_raw_train, 'BldgType', target[0], )
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'HouseStyle')
+plot_attribute_categorical(df_raw_train, 'HouseStyle', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Foundation')
+plot_attribute_categorical(df_raw_train, 'Foundation', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Functional')
+plot_attribute_categorical(df_raw_train, 'Functional', target[0])
 
 
 # %%
@@ -865,7 +977,7 @@ sns.regplot(x="MasVnrArea", y="SalePrice", data=df_raw_train);
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'MasVnrType')
+plot_attribute_categorical(df_raw_train, 'MasVnrType', target[0])
 
 
 # %%
@@ -929,11 +1041,11 @@ sns.regplot(x="LotFrontage", y="SalePrice", data=df_raw_train);
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'LotShape')
+plot_attribute_categorical(df_raw_train, 'LotShape', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'LotConfig')
+plot_attribute_categorical(df_raw_train, 'LotConfig', target[0])
 
 
 # %%
@@ -951,31 +1063,31 @@ plot_attribute_categorical(df_raw_train, target[0], 'LotConfig')
 #  7. **Condition2**, proximity to various conditions (if more than one is present)
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Alley')
+plot_attribute_categorical(df_raw_train, 'Alley', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'PavedDrive')
+plot_attribute_categorical(df_raw_train, 'PavedDrive', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Street')
+plot_attribute_categorical(df_raw_train, 'Street', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'LandContour')
+plot_attribute_categorical(df_raw_train, 'LandContour', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'LandSlope')
+plot_attribute_categorical(df_raw_train, 'LandSlope', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Condition1')
+plot_attribute_categorical(df_raw_train, 'Condition1', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Condition2')
+plot_attribute_categorical(df_raw_train, 'Condition2', target[0])
 
 
 # %%
@@ -989,11 +1101,11 @@ plot_attribute_categorical(df_raw_train, target[0], 'Condition2')
 # 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'MSZoning')
+#plot_attribute_categorical(df_raw_train, 'MSZoning', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'Neighborhood')
+plot_attribute_categorical(df_raw_train, 'Neighborhood', target[0])
 
 
 # %%
@@ -1010,19 +1122,19 @@ plot_attribute_categorical(df_raw_train, target[0], 'Neighborhood')
 # 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'SaleType')
+plot_attribute_categorical(df_raw_train, 'SaleType', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'SaleCondition')
+plot_attribute_categorical(df_raw_train, 'SaleCondition', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'YrSold')
+plot_attribute_categorical(df_raw_train, 'YrSold', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, target[0], 'MoSold')
+plot_attribute_categorical(df_raw_train, 'MoSold', target[0])
 
 
 # %%
