@@ -1105,7 +1105,7 @@ plot_attribute_categorical(df_raw_train, 'Condition2', target[0])
 
 
 # %%
-plot_attribute_categorical(df_raw_train, 'Neighborhood', target[0])
+plot_attribute_categorical_temp(df_raw_train, 'Neighborhood', target[0])
 
 
 # %%
