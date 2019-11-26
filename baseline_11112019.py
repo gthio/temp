@@ -1,13 +1,5 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
-# %% Change working directory from the workspace root to the ipynb file location. Turn this addition off with the DataScience.changeDirOnImportExport setting
-# ms-python.python added
-import os
-try:
-	os.chdir(os.path.join(os.getcwd(), '..\\..\..\..\AppData\Local\Temp'))
-	print(os.getcwd())
-except:
-	pass
 # %%
 
 
@@ -510,6 +502,21 @@ def plot_attribute_categorical_original(df, target, attribute):
 
 
 # %%
+def plot_regplot(df, attribute, target):
+    
+    #sns.regplot(x=attribute, y=target, data=df)
+    
+    ax = sns.regplot(x=attribute, y=target, data=df)
+    
+    ticks = ax.get_yticks()
+    ylabels = ['{:,.0f}'.format(x) for x in ticks]
+    
+    ax.set_yticklabels(ylabels)
+    
+plot_regplot(df_raw_train, 'LotArea', target[0])
+
+
+# %%
 
 
 # %% [markdown]
@@ -697,7 +704,7 @@ plot_attribute_categorical(df_raw_train, 'RoofStyle', target[0])
 #  7. **GarageYrBlt**, year garage was built
 
 # %%
-sns.regplot(x="GarageArea", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'GarageArea', 'SalePrice')
 
 
 # %%
@@ -745,7 +752,7 @@ plot_attribute_categorical(df_raw_train, 'GarageYrBlt', target[0])
 # 
 
 # %%
-sns.regplot(x="TotalBsmtSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'TotalBsmtSF', 'SalePrice')
 
 
 # %%
@@ -769,15 +776,15 @@ plot_attribute_categorical(df_raw_train, 'BsmtFinType2', target[0])
 
 
 # %%
-sns.regplot(x="BsmtFinSF1", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'BsmtFinSF1', 'SalePrice')
 
 
 # %%
-sns.regplot(x="BsmtFinSF2", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'BsmtFinSF2', 'SalePrice')
 
 
 # %%
-sns.regplot(x="BsmtUnfSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'BsmtUnfSF', 'SalePrice')
 
 
 # %%
@@ -816,7 +823,7 @@ plot_attribute_categorical(df_raw_train, 'FireplaceQu', target[0])
 
 
 # %%
-sns.regplot(x="GrLivArea", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'GrLivArea', 'SalePrice')
 
 
 # %%
@@ -880,7 +887,7 @@ plot_attribute_categorical(df_raw_train, 'MiscFeature', target[0])
 
 
 # %%
-sns.regplot(x="MiscVal", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'MiscVal', 'SalePrice')
 
 
 # %%
@@ -973,7 +980,7 @@ plot_attribute_categorical(df_raw_train, 'Functional', target[0])
 
 
 # %%
-sns.regplot(x="MasVnrArea", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'MasVnrArea', 'SalePrice')
 
 
 # %%
@@ -981,43 +988,43 @@ plot_attribute_categorical(df_raw_train, 'MasVnrType', target[0])
 
 
 # %%
-sns.regplot(x="1stFlrSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, '1stFlrSF', 'SalePrice')
 
 
 # %%
-sns.regplot(x="2ndFlrSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, '2ndFlrSF', 'SalePrice')
 
 
 # %%
-sns.regplot(x="LowQualFinSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'LowQualFinSF', 'SalePrice')
 
 
 # %%
-sns.regplot(x="WoodDeckSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'WoodDeckSF', 'SalePrice')
 
 
 # %%
-sns.regplot(x="OpenPorchSF", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'OpenPorchSF', 'SalePrice')
 
 
 # %%
-sns.regplot(x="EnclosedPorch", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'EnclosedPorch', 'SalePrice')
 
 
 # %%
-sns.regplot(x="3SsnPorch", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, '3SsnPorch', 'SalePrice')
 
 
 # %%
-sns.regplot(x="ScreenPorch", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'ScreenPorch', 'SalePrice')
 
 
 # %%
-sns.regplot(x="YearBuilt", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'YearBuilt', 'SalePrice')
 
 
 # %%
-sns.regplot(x="YearRemodAdd", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'YearRemodAdd', 'SalePrice')
 
 
 # %%
@@ -1033,11 +1040,11 @@ sns.regplot(x="YearRemodAdd", y="SalePrice", data=df_raw_train);
 # 
 
 # %%
-sns.regplot(x="LotArea", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'LotArea', 'SalePrice')
 
 
 # %%
-sns.regplot(x="LotFrontage", y="SalePrice", data=df_raw_train);
+plot_regplot(df_raw_train, 'LotFrontage', 'SalePrice')
 
 
 # %%
