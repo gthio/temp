@@ -514,7 +514,7 @@ def plot_attribute_categorical_original(df, target, attribute):
 def plot_regplot(df, attribute, target):
     
     #sns.regplot(x=attribute, y=target, data=df)
-    
+    fx, ax = plt.subplots(figsize=(8,6))
     ax = sns.regplot(x=attribute, y=target, data=df)
     
     ticks = ax.get_yticks()
@@ -523,6 +523,15 @@ def plot_regplot(df, attribute, target):
     ax.set_yticklabels(ylabels)
     
 #plot_regplot(df_raw_train, 'LotArea', target[0])
+
+
+# %%
+def plot_regplot_multiple(df_o, attributes, target):
+    
+    for attribute in attributes:
+        plot_regplot(df_o, attribute, target)
+
+#plot_regplot_multiple(df_raw_train, ['LotArea', 'LotArea'], target[0])
 
 
 # %%
@@ -690,7 +699,9 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  7. **GarageYrBlt**, year garage was built
 
 # %%
-plot_regplot(df_raw_train, 'GarageArea', 'SalePrice')
+attrs = ['GarageArea']
+
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -717,25 +728,15 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 # 
 
 # %%
-plot_regplot(df_raw_train, 'TotalBsmtSF', 'SalePrice')
-
-
-# %%
 attrs = ['BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2']
 
 plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
-plot_regplot(df_raw_train, 'BsmtFinSF1', 'SalePrice')
+attrs = ['TotalBsmtSF', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF']
 
-
-# %%
-plot_regplot(df_raw_train, 'BsmtFinSF2', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'BsmtUnfSF', 'SalePrice')
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -770,7 +771,9 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
-plot_regplot(df_raw_train, 'GrLivArea', 'SalePrice')
+attrs = ['GrLivArea']
+
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -810,7 +813,9 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
-plot_regplot(df_raw_train, 'MiscVal', 'SalePrice')
+attrs = ['MiscVal']
+
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -877,47 +882,11 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
-plot_regplot(df_raw_train, 'MasVnrArea', 'SalePrice')
+attrs = ['MasVnrArea', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'WoodDeckSF', 
+         'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 
+         'YearBuilt', 'YearRemodAdd']
 
-
-# %%
-plot_regplot(df_raw_train, '1stFlrSF', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, '2ndFlrSF', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'LowQualFinSF', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'WoodDeckSF', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'OpenPorchSF', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'EnclosedPorch', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, '3SsnPorch', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'ScreenPorch', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'YearBuilt', 'SalePrice')
-
-
-# %%
-plot_regplot(df_raw_train, 'YearRemodAdd', 'SalePrice')
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -933,11 +902,9 @@ plot_regplot(df_raw_train, 'YearRemodAdd', 'SalePrice')
 # 
 
 # %%
-plot_regplot(df_raw_train, 'LotArea', 'SalePrice')
+attrs = ['LotArea', 'LotFrontage']
 
-
-# %%
-plot_regplot(df_raw_train, 'LotFrontage', 'SalePrice')
+plot_regplot_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
