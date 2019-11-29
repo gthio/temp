@@ -442,13 +442,13 @@ def plot_attribute_categorical_temp(df, attribute, target):
 
 
 # %%
-
 def plot_attribute_categorical(df_o, attribute, target):
         
     df = df_o.copy(deep=True)
     
     df[attribute] = df[attribute].astype(str)
         
+    fx, ax = plt.subplots(figsize=(8,6))
     ax = sns.boxplot(x=attribute, y=target, data=df)
     ax = sns.stripplot(x=attribute, y=target, 
                        data=df, 
@@ -487,8 +487,17 @@ def plot_attribute_categorical(df_o, attribute, target):
         
     return
 
-#plot_attribute_categorical_type2(df_raw_train, 'BedroomAbvGr', target[0])
-#plot_attribute_categorical_type2(df_raw_train, 'ExterCond', target[0])
+#plot_attribute_categorical(df_raw_train, 'BedroomAbvGr', target[0])
+#plot_attribute_categorical(df_raw_train, 'ExterCond', target[0])
+
+
+# %%
+def plot_attribute_categorical_multiple(df_o, attributes, target):
+    
+    for attribute in attributes:
+        plot_attribute_categorical(df_o, attribute, target)
+
+#plot_attribute_categorical_multiple(df_raw_train, ['BedroomAbvGr', 'ExterCond'], target[0])
 
 
 # %%
@@ -513,7 +522,7 @@ def plot_regplot(df, attribute, target):
     
     ax.set_yticklabels(ylabels)
     
-plot_regplot(df_raw_train, 'LotArea', target[0])
+#plot_regplot(df_raw_train, 'LotArea', target[0])
 
 
 # %%
@@ -659,33 +668,10 @@ df_raw_train_meta.loc[df_raw_train_meta.index == attribute, :]
 #  6. **RoofStyle**: Type of roof (**Flat**: Flat, **Gable**: Gable, **Gambrel**: Gabrel (Barn), **Hip**: Hip, **Mansard**: Mansard, **Shed**: Shed)
 
 # %%
-plot_attribute_categorical(df_raw_train, 'ExterCond', target[0])
+attrs = ['ExterCond', 'ExterQual', 'Exterior1st', 'Exterior2nd', 
+         'Fence', 'RoofMatl', 'RoofStyle']
 
-
-# %%
-
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Exterior1st', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Exterior2nd', target[0])
-
-
-# %%
-
-
-plot_attribute_categorical(df_raw_train, 'Fence', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'RoofMatl', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'RoofStyle', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -708,31 +694,10 @@ plot_regplot(df_raw_train, 'GarageArea', 'SalePrice')
 
 
 # %%
-df_raw_train['GarageCars'].unique()
+attrs = ['GarageCars', 'GarageQual', 'GarageCond', 'GarageFinish', 
+         'GarageType', 'GarageYrBlt']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageCars', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageQual', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageCond', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageFinish', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageType', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'GarageYrBlt', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -756,23 +721,9 @@ plot_regplot(df_raw_train, 'TotalBsmtSF', 'SalePrice')
 
 
 # %%
-plot_attribute_categorical(df_raw_train, 'BsmtQual', target[0])
+attrs = ['BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtCond', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtExposure', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtFinType1', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtFinType2', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -797,11 +748,9 @@ plot_regplot(df_raw_train, 'BsmtUnfSF', 'SalePrice')
 #  2. **KitchenQual**, kitchen quality
 
 # %%
-plot_attribute_categorical(df_raw_train, 'KitchenAbvGr', target[0])
+attrs = ['KitchenAbvGr', 'KitchenQual']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'KitchenQual', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -815,11 +764,9 @@ plot_attribute_categorical(df_raw_train, 'KitchenQual', target[0])
 #  3. **GrLivArea**, Above grade (ground) living area square feet
 
 # %%
-plot_attribute_categorical(df_raw_train, 'Fireplaces', target[0])
+attrs = ['Fireplaces', 'FireplaceQu']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'FireplaceQu', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -840,27 +787,9 @@ plot_regplot(df_raw_train, 'GrLivArea', 'SalePrice')
 #  6. **BsmtHalfBath**, basement half bathrooms
 
 # %%
-plot_attribute_categorical(df_raw_train, 'BedroomAbvGr', target[0])
+attrs = ['BedroomAbvGr', 'TotRmsAbvGrd', 'FullBath', 'HalfBath', 'BsmtFullBath', 'BsmtHalfBath']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'TotRmsAbvGrd', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'FullBath', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'HalfBath', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtFullBath', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'BsmtHalfBath', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -875,15 +804,9 @@ plot_attribute_categorical(df_raw_train, 'BsmtHalfBath', target[0])
 #  4. **MiscVal**: $Value of miscellaneous feature
 
 # %%
-plot_attribute_categorical(df_raw_train, 'PoolQC', target[0])
+attrs = ['PoolQC', 'PoolArea', 'MiscFeature']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'PoolArea', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'MiscFeature', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -903,23 +826,9 @@ plot_regplot(df_raw_train, 'MiscVal', 'SalePrice')
 #  5. **Utilities**: Type of utilities available
 
 # %%
-plot_attribute_categorical(df_raw_train, 'Electrical', target[0])
+attrs = ['Electrical', 'CentralAir', 'Heating', 'HeatingQC', 'Utilities']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'CentralAir', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Heating', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'HeatingQC', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Utilities', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -932,11 +841,9 @@ plot_attribute_categorical(df_raw_train, 'Utilities', target[0])
 #  2. **OverallCond**, rates the overall condition of the house
 
 # %%
-plot_attribute_categorical(df_raw_train, 'OverallQual', target[0])
+attrs = ['OverallQual', 'OverallCond']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'OverallCond', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -964,27 +871,13 @@ plot_attribute_categorical(df_raw_train, 'OverallCond', target[0])
 # 
 
 # %%
-plot_attribute_categorical(df_raw_train, 'BldgType', target[0], )
+attrs = ['BldgType', 'HouseStyle', 'Foundation', 'Functional', 'MasVnrType']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'HouseStyle', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Foundation', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Functional', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
 plot_regplot(df_raw_train, 'MasVnrArea', 'SalePrice')
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'MasVnrType', target[0])
 
 
 # %%
@@ -1048,11 +941,9 @@ plot_regplot(df_raw_train, 'LotFrontage', 'SalePrice')
 
 
 # %%
-plot_attribute_categorical(df_raw_train, 'LotShape', target[0])
+attrs = ['LotShape', 'LotConfig']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'LotConfig', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -1070,31 +961,10 @@ plot_attribute_categorical(df_raw_train, 'LotConfig', target[0])
 #  7. **Condition2**, proximity to various conditions (if more than one is present)
 
 # %%
-plot_attribute_categorical(df_raw_train, 'Alley', target[0])
+attrs = ['Alley', 'PavedDrive', 'Street', 'LandContour', 'LandSlope', 
+         'Condition1', 'Condition2']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'PavedDrive', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Street', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'LandContour', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'LandSlope', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Condition1', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'Condition2', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
@@ -1129,19 +999,9 @@ plot_attribute_categorical_temp(df_raw_train, 'Neighborhood', target[0])
 # 
 
 # %%
-plot_attribute_categorical(df_raw_train, 'SaleType', target[0])
+attrs = ['SaleType', 'SaleCondition', 'YrSold', 'MoSold']
 
-
-# %%
-plot_attribute_categorical(df_raw_train, 'SaleCondition', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'YrSold', target[0])
-
-
-# %%
-plot_attribute_categorical(df_raw_train, 'MoSold', target[0])
+plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
 
 # %%
