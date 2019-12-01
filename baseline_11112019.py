@@ -1686,6 +1686,10 @@ data_standardize(df_clean_norm_test, numeric_attributes)
 
 
 # %%
+#df_clean_norm_train['SalePrice'] = np.log(df_clean_norm_train['SalePrice'])
+
+
+# %%
 #attribute_to_scale = numeric_attributes + target
 
 #scaler = StandardScaler()
