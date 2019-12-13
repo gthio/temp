@@ -3,6 +3,8 @@
 # %%
 
 
+#https://www.kaggle.com/neviadomski/how-to-get-to-top-25-with-simple-model-sklearn
+
 
 # %%
 #https://medium.com/@datalesdatales/why-you-should-be-plotting-learning-curves-in-your-next-machine-learning-project-221bae60c53
@@ -1817,7 +1819,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # ## Stochastic Gradient Descent regressor
 
 # %%
-model_number_of_features = 40
+model_number_of_features = 41
 model_validation_size = 0.25
 model_seed = 2
 
@@ -1908,16 +1910,21 @@ plt.show()
 
 # %%
 # get prediction 
-y_pred = model.predict(X_validation)
+y_validation_pred = model.predict(X_validation)
+y_train_pred = model.predict(X_train)
+
+
+# %%
+
 
 
 # %%
 # compute model evaluation metrices
 
-mse = mean_squared_error(y_validation, y_pred)
-mae = mean_absolute_error(y_validation, y_pred)
+mse = mean_squared_error(y_validation, y_validation_pred)
+mae = mean_absolute_error(y_validation, y_validation_pred)
 rmse = np.sqrt(mse)
-r2 = r2_score(y_validation, y_pred)
+r2 = r2_score(y_validation, y_validation_pred)
 
 result = {
     'metric': ['MSE', 'MAE', 'RMSE', 'R2'], 
@@ -1929,6 +1936,38 @@ pd.DataFrame(result)
 #8.934228e-01
 #8.943792e-01
 #8.971829e-01
+
+
+# %%
+df_temp = X_validation.copy(deep=True)
+
+df_temp['Type'] = 'Validation' 
+df_temp['SalePrice_Actual'] = y_validation['SalePrice'] 
+df_temp['SalePrice_Predicted'] = y_validation_pred
+
+df_temp2a = df_temp.loc[:, ['Type', 'SalePrice_Actual', 'SalePrice_Predicted']]
+df_temp2a.head(5)
+
+
+# %%
+df_temp = X_train.copy(deep=True)
+
+df_temp['Type'] = 'Train' 
+df_temp['SalePrice_Actual'] = y_train['SalePrice'] 
+df_temp['SalePrice_Predicted'] = y_train_pred
+
+df_temp2b = df_temp.loc[:, ['Type', 'SalePrice_Actual', 'SalePrice_Predicted']]
+df_temp2b.head(5)
+
+
+# %%
+df_temp = pd.concat([df_temp2a,df_temp2b], axis=0)
+df_temp = df_clean_norm_train.merge(df_temp, left_index=True, right_index=True, how='outer')
+df_temp
+
+
+# %%
+
 
 # %% [markdown]
 # ### Fine tuning
@@ -1979,7 +2018,7 @@ fig.set_figheight(5)
 fig.set_figwidth(30)
 
 ax.scatter(x = range(0, size), y=y_validation[0:size], c = 'blue', label = 'pred', alpha = 0.5)
-ax.scatter(x = range(0, size), y=y_pred[0:size], c = 'red', label = 'act', alpha = 0.5)
+ax.scatter(x = range(0, size), y=y_validation_pred[0:size], c = 'red', label = 'act', alpha = 0.5)
 plt.title('Actual and predicted values')
 plt.xlabel('Observations')
 plt.ylabel('price')
@@ -1990,7 +2029,7 @@ plt.show()
 # %%
 # plot validation data - predicited + actual result
 
-diff = y_validation[0:y_pred.size]['SalePrice'] - y_pred[:,]
+diff = y_validation[0:y_validation_pred.size]['SalePrice'] - y_validation_pred[:,]
 diff.hist(bins = 40)
 plt.title('Histogram of prediction errors')
 plt.xlabel('Price prediction error')
@@ -2003,7 +2042,7 @@ plt.ylabel('Frequency')
 
 # %%
 plt.plot([0, 450000], [0, 450000], '--r')
-plt.scatter(y_validation[0:size], y_pred[0:size])
+plt.scatter(y_validation[0:size], y_validation_pred[0:size])
 
 plt.xlabel('Prediction', size=15)
 plt.ylabel('Actual', size=15)
@@ -2082,6 +2121,8 @@ with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writ
     df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
     df_clean_outlier_train.to_excel(writer, sheet_name='train_clean')
     df_clean_outlier_train_meta_sorted.to_excel(writer, sheet_name='train_clean_corr')
+    
+    df_temp.to_excel(writer, sheet_name='temp')
 
 
 # %%
