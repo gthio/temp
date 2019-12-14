@@ -1990,6 +1990,7 @@ pd.DataFrame(result)
 
 #8.934228e-01
 #8.943792e-01
+#8.973478e-01
 
 # %% [markdown]
 # ### Fine tuning
