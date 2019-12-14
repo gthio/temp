@@ -1094,7 +1094,8 @@ def data_missing_handler(df):
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
+    #set_missing_data_with_value(df, 'TotalBsmtSF', 0)
+    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, '1stFlrSF', 0)
@@ -1170,7 +1171,8 @@ def data_derive_neighborhood_code(df):
     df_temp_group.sort_values(by="d_PricePerSF_median", ascending=True, inplace=True)
 
     # set computed Neighborhood's code value
-    df_temp_group['d_Neighborhood_Code'] = df_temp_group.reset_index().index + 1
+    #df_temp_group['d_Neighborhood_Code'] = df_temp_group.reset_index().index + 1
+    df_temp_group['d_Neighborhood_Code'] = df_temp_group['d_PricePerSF_median']
     
     return df_temp_group
 
@@ -1265,15 +1267,15 @@ def data_numeric_encoding(df):
     
     # numeric encoding - GarageQual
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
-        {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2.1})
+        {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
     
     # numeric encoding - BsmtExposure
     df['BsmtExposure_Encoded'] = df['BsmtExposure'].map( 
-        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1.1})         
+        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1})         
     
     # numeric encoding - ExterQual
     df['ExterQual_Encoded'] = df['ExterQual'].map( 
-        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1})
+        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':2, 'Po':1})
 
     # numeric encoding - ExterCond
     df['ExterCond_Encoded'] = df['ExterCond'].map( 
@@ -1285,7 +1287,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - CentralAir
     df['Electrical_Encoded'] = df['Electrical'].map( 
-        {'SBrkr':3, 'FuseA':2, 'FuseF':2, 'FuseP':2, 'Mix':1, np.NaN:3.1})       
+        {'SBrkr':3, 'FuseA':2, 'FuseF':2, 'FuseP':2, 'Mix':1, np.NaN:3})       
     
     # numeric encoding - KitchenQual
     df['KitchenQual_Encoded'] = df['KitchenQual'].map( 
@@ -1296,28 +1298,29 @@ def data_numeric_encoding(df):
         {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1})   
     
     # numeric encoding - Alley
-    #df['Alley_Encoded'] = df['Alley'].map( 
-    #    {'Pave':2, 'Grvl':1})    
+    df['Alley_Encoded'] = df['Alley'].map( 
+        {'Pave':2, 'Grvl':1})    
     
     # numeric encoding - LotShape
     df['LotShape_Encoded'] = df['LotShape'].map( 
         {'Reg':2, 'IR1':1, 'IR2':1, 'IR3':1})
 
     # numeric encoding - LandSlope - XXX
-    #df['LandSlope_Encoded'] = df['LandSlope'].map( 
-    #    {'Gtl':3, 'Mod':2, 'Sev':1})
+    df['LandSlope_Encoded'] = df['LandSlope'].map( 
+        {'Gtl':3, 'Mod':2, 'Sev':1})
 
     # numeric encoding - GarageFinish
     df['GarageFinish_Encoded'] = df['GarageFinish'].map( 
-        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 2.1})    
+        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 2})    
     
     # numeric encoding - GarageQual
     df['GarageQual_Encoded'] = df['GarageQual'].map( 
-        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 1.1})
+        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})
     
     # numeric encoding - GarageQual
     df['GarageType_Encoded'] = df['GarageType'].map( 
-        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 1.1})    
+        #{'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 1.1})    
+        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 0})
     
     # numeric encoding - Foundation
     df['Foundation_Encoded'] = df['Foundation'].map( 
@@ -1325,7 +1328,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - Foundation
     df['MasVnrType_Encoded'] = df['MasVnrType'].map( 
-        {'Stone':4, 'BrkFace':3, 'None':2, 'BrkCmn':1, np.NaN: 2.1 })
+        {'Stone':4, 'BrkFace':3, 'None':2, 'BrkCmn':1, np.NaN: 1 })
 
     # numeric encoding - Paved drive
     df['PavedDrive_Encoded'] = df['PavedDrive'].map( 
@@ -1333,7 +1336,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - MSZoning
     df['MSZoning_Encoded'] = df['MSZoning'].map( 
-        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 1.1 })     
+        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 1 })     
     
 data_numeric_encoding(df_base_train)
 data_numeric_encoding(df_base_test)
@@ -1362,10 +1365,10 @@ def data_numeric_encoding_missing(df):
     set_missing_data_with_freq_value(df, 'LotShape_Encoded')
 
     # impute missing encoded data - Alley_Encoded
-    #set_missing_data_with_freq_value(df, 'Alley_Encoded')
+    set_missing_data_with_freq_value(df, 'Alley_Encoded')
 
     # impute missing encoded data - LandSlope_Encoded xxx
-    #set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
+    set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
 
     # impute missing encoded data - CentralAir_Encoded
     set_missing_data_with_freq_value(df, 'CentralAir_Encoded')
@@ -1444,8 +1447,8 @@ def data_missing_handler(df):
     set_missing_data_with_freq_value(df, 'LotFrontage')
     
     # set TotalBsmtSF to most frequent value if its null
-    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
+    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    #set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
    
     # set GarageYrBlt to YearBuilt if its null
     df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
@@ -1819,7 +1822,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # ## Stochastic Gradient Descent regressor
 
 # %%
-model_number_of_features = 41
+model_number_of_features = 38
 model_validation_size = 0.25
 model_seed = 2
 
