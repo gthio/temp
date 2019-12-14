@@ -1,13 +1,5 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
-# %% Change working directory from the workspace root to the ipynb file location. Turn this addition off with the DataScience.changeDirOnImportExport setting
-# ms-python.python added
-import os
-try:
-	os.chdir(os.path.join(os.getcwd(), '..\\..\..\..\AppData\Local\Temp'))
-	print(os.getcwd())
-except:
-	pass
 # %%
 
 
@@ -1217,7 +1209,8 @@ def data_derive_neighborhood_code(df):
     df_temp_group.sort_values(by="d_PricePerSF_median", ascending=True, inplace=True)
 
     # set computed Neighborhood's code value
-    df_temp_group['d_Neighborhood_Code'] = df_temp_group.reset_index().index + 1
+    #df_temp_group['d_Neighborhood_Code'] = df_temp_group.reset_index().index + 1
+    df_temp_group['d_Neighborhood_Code'] = df_temp_group['d_PricePerSF_median'] 
     
     return df_temp_group
 
