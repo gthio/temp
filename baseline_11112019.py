@@ -1265,6 +1265,10 @@ df_base_train
 # %%
 def data_numeric_encoding(df):
     
+    # numeric encoding - OverallQual
+    #df['OverallQual_Encoded'] = df['OverallQual'].map( 
+    #    {'0':4, '1':4, '2':4, '3':4, '4':4, '5':5, '6':6, '7':7, '8':8, '9':8, '10':8 })          
+    
     # numeric encoding - GarageQual
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
         {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
@@ -1447,8 +1451,8 @@ def data_missing_handler(df):
     set_missing_data_with_freq_value(df, 'LotFrontage')
     
     # set TotalBsmtSF to most frequent value if its null
-    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
-    #set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
+    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
    
     # set GarageYrBlt to YearBuilt if its null
     df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
