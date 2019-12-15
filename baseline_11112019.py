@@ -1094,8 +1094,7 @@ def data_missing_handler(df):
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
-    #set_missing_data_with_value(df, 'TotalBsmtSF', 0)
-    set_missing_data_with_freq_value(df, 'TotalBsmtSF')
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
     
     # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, '1stFlrSF', 0)
@@ -1424,44 +1423,6 @@ data_numeric_encoding_missing(df_base_test)
 
 # %% [markdown]
 #  #### Other - missing data handling
-
-# %%
-# handler for missing data
-
-def data_missing_handler(df):
-
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'MasVnrArea', 0)
-
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'GarageCars', 0)    
-
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'Bath_Derived', 1)
-    
-    
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'BsmtUnfSF', 0)    
-    
-    
-
-    
-    
-    # set LotFrontage to most frequent value if its null
-    set_missing_data_with_freq_value(df, 'LotFrontage')
-    
-    # set TotalBsmtSF to most frequent value if its null
-    #set_missing_data_with_freq_value(df, 'TotalBsmtSF')
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
-   
-    # set GarageYrBlt to YearBuilt if its null
-    df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
-    
-    
-
-#data_missing_handler(df_base_train)
-#data_missing_handler(df_base_test)
-
 
 # %%
 # exclude un-used columns
@@ -1842,6 +1803,8 @@ model_cv = 5
 features = df_attribute_scores.iloc[0:model_number_of_features].sort_values(
     by='kbest', ascending=False)['attribute']
 
+features
+
 
 # %%
 # allocate data for training and validation works
@@ -1943,6 +1906,7 @@ pd.DataFrame(result)
 #8.934228e-01
 #8.943792e-01
 #8.971829e-01
+#8.973959e-01
 
 
 # %%
