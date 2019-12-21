@@ -1812,6 +1812,8 @@ features
 X = df_clean_norm_train[features] 
 y = df_clean_norm_train[target]
 
+y = np.log(y)
+
 X_train, X_validation, y_train, y_validation = train_test_split(
     X, 
     y, 
@@ -1882,6 +1884,14 @@ plt.show()
 # get prediction 
 y_validation_pred = model.predict(X_validation)
 y_train_pred = model.predict(X_train)
+
+
+# %%
+y_validation = np.exp(y_validation)
+y_train = np.exp(y_train)
+
+y_validation_pred = np.exp(y_validation_pred)
+y_train_pred = np.exp(y_train_pred)
 
 
 # %%
@@ -2070,6 +2080,7 @@ X_test.set_index("Id", drop=True, inplace=True)
 # get prediction - use model with highest validation score ('test_score')
 
 y_pred = model.predict(X_test)
+y_pred = np.exp(y_pred)
 
 res = X_test
 res['SalePrice'] = y_pred
