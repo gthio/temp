@@ -1789,7 +1789,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # %%
 model_number_of_features = 38
 model_validation_size = 0.25
-model_seed = 2
+model_seed = 8
 
 model_iteration_max = 2500
 model_tollerance = 0.0005
@@ -1846,7 +1846,7 @@ cv_results
 
 # %%
 # get model with highest validation score ('test_score')
-model = cv_results['estimator'][0]
+model = cv_results['estimator'][4]
 
 
 # %%
@@ -1907,6 +1907,8 @@ pd.DataFrame(result)
 #8.943792e-01
 #8.971829e-01
 #8.973959e-01
+
+#8.794422e-01 better test score
 
 
 # %%
@@ -2008,17 +2010,21 @@ plt.ylabel('Frequency')
 
 
 # %%
+plt.plot([0, 450000], [0, 450000], '--r')
+plt.scatter(y_train[0:size], y_train_pred[0:size])
 
+plt.xlabel('Actual', size=15)
+plt.ylabel('Prediction', size=15)
+plt.title('Train set')
 
 
 # %%
 plt.plot([0, 450000], [0, 450000], '--r')
 plt.scatter(y_validation[0:size], y_validation_pred[0:size])
 
-plt.xlabel('Prediction', size=15)
-plt.ylabel('Actual', size=15)
-plt.tick_params(axis='x')
-plt.tick_params(axis='y')
+plt.xlabel('Actual', size=15)
+plt.ylabel('Prediction', size=15)
+plt.title('Validation set')
 
 
 # %%
