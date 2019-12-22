@@ -16,16 +16,18 @@
 #https://python-graph-gallery.com/10-barplot-with-number-of-observation/
 #https://matplotlib.org/3.1.0/gallery/statistics/barchart_demo.html#sphx-glr-gallery-statistics-barchart-demo-py
 
+#    #https://matplotlib.org/mpl-probscale/tutorial/closer_look_at_viz.html
+
 # %% [markdown]
 #  # Problem formulation
 #  ---
 # 
-#  This notebook contains detail work on building machine learning model(s) to predict house's sale price in Ames, Iowa. The model is build based on historical sale price with its 79 explanatory attributes like house area, lot size, house's condition, etc.
+#  This notebook contains detail work on building supervised machine learning model(s) to predict house's sale price in Ames, Iowa. The model is build based on historical sale price with its 80 explanatory attributes like house area, lot size, house's condition, etc.
 # 
 # %% [markdown]
 #  # Context
 #  ---
-#  Dataset covers house sale price in Ames - Iowa, from January 2006 to July 2010, with its 79 explanatory attributes describing every feature every feature of homes.
+#  Dataset covers house sale price in Ames - Iowa, from January 2006 to July 2010, with its 80 explanatory attributes describing every feature every feature of homes. The entire data contains 1,460 sales dataset and 1,459 test dataset without sales price.
 # 
 # 
 #  **Data sources**
@@ -48,14 +50,16 @@
 # %%
 import numpy as np
 import pandas as pd
+import re
+
+from datetime import datetime
+from scipy import stats
+
+# matplotlib + seaborn chart packages
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.style as style
 import seaborn as sns
-from datetime import datetime
-
-from scipy import stats
-import re
 
 # sklearn's pre-processing
 from sklearn.impute import SimpleImputer
@@ -77,16 +81,12 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 
 # %%
-
-
-
-# %%
 # set dataframe display options
 pd.set_option('display.max_columns', None)  
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.expand_frame_repr', False)
 pd.set_option('max_colwidth', -1)
-#style="whitegrid", 
+
 #set pyplot and seaborn style
 sns.set(palette="pastel", color_codes=True)
 style.use('fivethirtyeight')
@@ -116,7 +116,7 @@ def get_meta_data(df):
 
 
 # %%
-# get missing data info for each attribute
+# for x attribute, get missing data info (number of non-null, null and pct of null)
 
 def get_stat_null(x, df_data):
     
@@ -129,7 +129,7 @@ def get_stat_null(x, df_data):
 
 
 # %%
-# get each attribute's uniqueness data
+# for x attribute, get count of unique values and list of unique values
 
 def get_stat_uniqueness(x, df_data):
     
@@ -148,7 +148,7 @@ def get_stat_uniqueness(x, df_data):
 
 
 # %%
-# get each attribute's statistic value (ie. skew and kurtosis)
+# for x attribute, get attribute's skewness and kurtosis
 
 def get_stat(x, df_data):
     
@@ -162,20 +162,6 @@ def get_stat(x, df_data):
         kurtosis = df_data[col].kurtosis()
         
     return [skewness, kurtosis]
-
-
-# %%
-# get dataframe stat (metadata)
-
-def get_dataframe_metadata(df):
-    
-    # get and set dataframe's metadata
-    df_meta = get_meta_data(df)
-
-    # set stat info for each attribute
-    set_stat(df, df_meta)
-
-    return df_meta
 
 
 # %%
@@ -232,6 +218,20 @@ def set_stat(df_data, df_meta):
 
 
 # %%
+# get dataframe stat (metadata)
+
+def get_dataframe_metadata(df):
+    
+    # get and set dataframe's metadata
+    df_meta = get_meta_data(df)
+
+    # set stat info for each attribute
+    set_stat(df, df_meta)
+
+    return df_meta
+
+
+# %%
 # compute correlation
 
 def compute_correlation_matrix(df, target, attributes):
@@ -280,10 +280,10 @@ def plot_pca(df, target, attributes):
 
 def plot_pca_smarter(df, df_meta, target, number_of_attributes):
 
-
     attributes = df_meta.loc[(np.in1d(df_meta.dtype, dtype_numeric)) & (df_meta['null_count'] == 0)][1:number_of_attributes].index
 
     cols_1d = plot_pca(df, target, attributes)
+
     
 def plot_pca_smarter2(df, df_meta, target, attributes):
 
@@ -324,17 +324,6 @@ def plot_attribute_chart(df, attribute):
     # boxplot
     ax3 = fig.add_subplot(grid[0:3, 2])
     sns.boxplot(df.loc[:, attribute], orient='v', ax=ax3)
-
-    #https://matplotlib.org/mpl-probscale/tutorial/closer_look_at_viz.html
-
-
-# %%
-# plot attribute charts - multiple
-
-def plot_attributes_chart(df, attributes):
-
-    for attribute in attributes:
-        plot_attribute_chart(df, attribute)
 
 
 # %%
@@ -388,16 +377,15 @@ def set_missing_data_with_freq_value(df, attribute):
     
     df[attribute] = imputer.transform(df[[attribute]])
 
+
+# %%
 def set_missing_data_with_value(df, attribute, fill_value):
     
     imputer = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value=fill_value)
     imputer.fit(df[[attribute]])
     
     df[attribute] = imputer.transform(df[[attribute]])
-
-
-# %%
-
+    
 
 
 # %%
@@ -628,12 +616,6 @@ df_raw_test.head(config_df_row_count)
 # get train data metadata
 df_raw_train_meta = get_dataframe_metadata(df_raw_train)
 df_raw_train_meta.head(config_df_row_count)
-
-
-# %%
-# get test data metadata
-df_raw_test_meta = get_dataframe_metadata(df_raw_test)
-df_raw_test_meta.head(config_df_row_count)
 
 
 # %%
