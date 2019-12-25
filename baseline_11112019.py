@@ -1403,6 +1403,17 @@ def data_numeric_encoding_missing(df):
 data_numeric_encoding_missing(df_base_train)
 data_numeric_encoding_missing(df_base_test)
 
+
+# %%
+df_base_train['GarageScore_Derived'] = df_base_train['GarageCars'] * df_base_train['GarageQual_Encoded']
+df_base_test['GarageScore_Derived'] = df_base_test['GarageCars'] * df_base_test['GarageQual_Encoded']
+
+df_base_train['KitchenScore_Derived'] = df_base_train['KitchenQual_Encoded'] * df_base_train['KitchenAbvGr']
+df_base_test['KitchenScore_Derived'] = df_base_test['KitchenQual_Encoded'] * df_base_test['KitchenAbvGr']
+
+#df_base_train['OverallGrade_Derived'] = df_base_train['OverallQual'] * df_base_train['OverallCond']
+#df_base_test['OverallGrade_Derived'] = df_base_test['OverallQual'] * df_base_test['OverallCond']
+
 # %% [markdown]
 #  #### Other - missing data handling
 
@@ -1412,7 +1423,10 @@ data_numeric_encoding_missing(df_base_test)
 exclusions = [#'Id', 
     'HouseAge_Derived', 'RemodAge_Derived',
     'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 
-    'GarageArea', 'GarageYrBlt',
+    'GarageArea', 'GarageYrBlt', 'GarageQual_Encoded', 'GarageCars', 'Garage_Has_Derived',
+    'HasPool_Has_Derived',
+    #'ExterQual_Encoded', 'ExterCond_Encoded',
+    'KitchenQual_Encoded','KitchenAbvGr',
 
     'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'WoodDeckSF',
     
@@ -1424,8 +1438,9 @@ exclusions = [#'Id',
     'MiscFeature', 'MiscVal', 
     
     'TotRmsAbvGrd', 'GrLivArea',
+    'TotalFlrSF_Derived', 'TotalBsmtSF',
     
-    'MSSubClass'
+    'MSSubClass', 'GardenSF_Derived'
     
     #'OverallCond'
 ] 
@@ -1506,6 +1521,7 @@ numeric_attributes = list(set(numeric_attributes) - set(variable_ignored) - set(
 
 # %%
 attributes = ['SalePrice', 'LotArea', 'TotalFlrSF_Derived', 'TotalBsmtSF'] 
+attributes = ['SalePrice', 'LotArea'] 
 
 for attribute in attributes:	
 
@@ -1542,10 +1558,10 @@ plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
-attribute = 'TotalFlrSF_Derived'
+#attribute = 'TotalFlrSF_Derived'
 
-plot_attribute_chart(df_base_train, attribute)
-plot_attribute_chart(df_clean_outlier_train, attribute)
+#plot_attribute_chart(df_base_train, attribute)
+#plot_attribute_chart(df_clean_outlier_train, attribute)
 
 
 # %%
@@ -1692,10 +1708,10 @@ plot_attribute_chart(df_clean_norm_train, attribute)
 
 
 # %%
-attribute = 'TotalFlrSF_Derived'
+#attribute = 'TotalFlrSF_Derived'
 
-plot_attribute_chart(df_clean_outlier_train, attribute)
-plot_attribute_chart(df_clean_norm_train, attribute)
+#plot_attribute_chart(df_clean_outlier_train, attribute)
+#plot_attribute_chart(df_clean_norm_train, attribute)
 
 
 # %%
@@ -1769,7 +1785,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # ## Stochastic Gradient Descent regressor
 
 # %%
-model_number_of_features = 38
+model_number_of_features = 32
 model_validation_size = 0.25
 model_seed = 8
 
@@ -1830,7 +1846,7 @@ cv_results
 
 # %%
 # get model with highest validation score ('test_score')
-model = cv_results['estimator'][4]
+model = cv_results['estimator'][2]
 
 
 # %%
