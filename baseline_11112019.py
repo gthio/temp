@@ -401,6 +401,9 @@ def plot_attribute_categorical_temp(df, attribute, target):
     
     ax.set_ylabel('')
     
+    if len(ax.get_xticklabels()) > 8:
+        plt.xticks(rotation=45)    
+    
     plotCats = [re.split(', ', str(x).replace(')', '').replace('\'', ''))[2] for 
                 x in ax.get_yticklabels()] 
 
@@ -443,6 +446,9 @@ def plot_attribute_categorical(df_o, attribute, target):
     ax = sns.stripplot(x=attribute, y=target, 
                        data=df, 
                        color="orange", jitter=0.2, size=2.5)
+    
+    if len(ax.get_xticklabels()) > 8:
+        plt.xticks(rotation=45)
     
     plotCats = [re.split(', ', str(x).replace(')', '').replace('\'', ''))[2] for 
                 x in ax.get_xticklabels()] 
@@ -791,7 +797,7 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  4. **MiscVal**: $Value of miscellaneous feature
 
 # %%
-attrs = ['PoolQC', 'PoolArea', 'MiscFeature']
+attrs = ['PoolArea', 'PoolQC', 'MiscFeature']
 
 plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 
@@ -1718,7 +1724,7 @@ df_clean_norm_train_meta_sorted.head(config_df_row_correlation_count)
 
 # %%
 # plot target to features 1-d pca
-plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 19)
+plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 38)
 
 
 # %%
@@ -1733,6 +1739,10 @@ plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 1
 #  [feature_selection](https://machinelearningmastery.com/feature-selection-machine-learning-python/)
 
 # %%
+model_number_of_features = 38
+
+
+# %%
 # Inspect and compare f-scores (all attributes)
 kbest = SelectKBest(k=len(numeric_attributes), 
     score_func=f_regression)
@@ -1741,20 +1751,16 @@ kbest.fit(df_clean_norm_train[numeric_attributes],
     df_clean_norm_train[target[0]]) 
 
 df_attribute_scores = pd.DataFrame({'attribute': numeric_attributes, 'kbest': kbest.scores_}).sort_values(by='kbest', ascending=False)
-df_attribute_scores
+df_attribute_scores.reset_index()
 
 
 # %%
-features = df_attribute_scores.iloc[0:18, 0]
+features = df_attribute_scores.iloc[0:model_number_of_features, 0]
 
 plot_pca_smarter2(df_clean_norm_train, 
     df_clean_norm_train_meta_sorted, 
     target, 
     features)
-
-
-# %%
-
 
 
 # %%
@@ -1769,7 +1775,7 @@ plot_pca_smarter2(df_clean_norm_train,
 # ## Stochastic Gradient Descent regressor
 
 # %%
-model_number_of_features = 38
+
 model_validation_size = 0.25
 model_seed = 8
 
