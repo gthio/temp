@@ -935,7 +935,7 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 # 
 
 # %%
-#plot_attribute_categorical(df_raw_train, 'MSZoning', target[0])
+#plot_attribute_categorical_temp(df_raw_train, 'MSZoning', target[0])
 
 
 # %%
@@ -944,6 +944,56 @@ plot_attribute_categorical_temp(df_raw_train, 'Neighborhood', target[0])
 
 # %%
 
+
+
+# %%
+
+
+
+# %%
+data = df_raw_train
+g = sns.jointplot(x="LotArea", y="SalePrice", data=data, kind='reg')
+g.ax_joint.get_lines()[0].set_color('red')
+
+
+# %%
+#zzzzzzzzzz
+
+def plot_regplot_zzzz(df, attribute, target):
+    
+    #sns.regplot(x=attribute, y=target, data=df)
+    fx, ax = plt.subplots(figsize=(10,6))
+    ax = sns.lmplot(x=attribute, y=target, data=df, hue='Neighborhood')
+    
+    ticks = ax.get_yticks()
+    ylabels = ['{:,.0f}'.format(x) for x in ticks]
+   
+    ax.set_yticklabels(ylabels)
+
+#dfx = df_raw_train.loc[df_raw_train['Neighborhood'] == 'CollgCr']    
+
+#plot_regplot_zzzz(df_raw_train, 'LotArea', target[0])
+#plot_regplot_zzzz(df_raw_train.loc[df_raw_train['Neighborhood'] == 'NAmes'], 'LotArea', target[0])
+
+
+#sns.regplot(x=attribute, y=target, data=df_raw_train)
+
+
+fx, axs = plt.subplots(nrows=2)
+
+ax = sns.regplot(x='LotArea', y='SalePrice', ax=axs[0], data=df_raw_train.loc[df_raw_train['Neighborhood'] == 'CollgCr'])
+ticks = ax.get_yticks()
+ylabels = ['{:,.0f}'.format(x) for x in ticks]
+ax.set_yticklabels(ylabels)
+
+ax = sns.regplot(x='LotArea', y='SalePrice', ax=axs[1], data=df_raw_train.loc[df_raw_train['Neighborhood'] == 'NAmes'])
+ticks = ax.get_yticks()
+ylabels = ['{:,.0f}'.format(x) for x in ticks]
+ax.set_yticklabels(ylabels)
+
+
+
+    
 
 # %% [markdown]
 #  ### Sell condition
@@ -1094,6 +1144,9 @@ def data_missing_handler(df):
     set_missing_data_with_value(df, 'ScreenPorch', 0)    
     set_missing_data_with_value(df, 'WoodDeckSF', 0)
     
+    set_missing_data_with_value(df, 'YrSold', 2010)
+    set_missing_data_with_value(df, 'MoSold', 4)
+    
 
     df.loc[df['LotFrontage'].isnull(), 'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
     
@@ -1102,6 +1155,10 @@ def data_missing_handler(df):
 
 data_missing_handler(df_base_train)
 data_missing_handler(df_base_test)
+
+
+# %%
+
 
 # %% [markdown]
 #  ### Derives attribute(s)
@@ -1135,8 +1192,16 @@ def data_derive_attributes(df):
     df['TotalBldgSF_Derived'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
     df['GardenSF_Derived'] = df['LotArea'] - df['1stFlrSF']
     
+    
+    df.loc[df['Age_Derived'] <= 0, 'Age_Derived'] = 0.1
+    
+    
 data_derive_attributes(df_base_train) 
 data_derive_attributes(df_base_test) 
+
+
+# %%
+df_base_test.loc[df_base_test['Age_Derived'] > 0.0001, ['Age_Derived', 'HouseAge_Derived', 'RemodAge_Derived']]
 
 
 # %%
@@ -1624,7 +1689,7 @@ numeric_attributes = list(set(numeric_attributes) - set(variable_ignored) - set(
 
 
 # %%
-len(numeric_attributes)
+
 
 
 # %%
@@ -1724,7 +1789,7 @@ df_clean_norm_train_meta_sorted.head(config_df_row_correlation_count)
 
 # %%
 # plot target to features 1-d pca
-plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 38)
+plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 18)
 
 
 # %%
@@ -1796,11 +1861,24 @@ features
 
 # %%
 # allocate data for training and validation works
+df_clean_norm_train['LotArea'] = np.log(df_clean_norm_train['LotArea'])
+df_clean_norm_train['TotalBldgSF_Derived'] = np.log(df_clean_norm_train['TotalBldgSF_Derived'])
+df_clean_norm_train['TotalFlrSF_Derived'] = np.log(df_clean_norm_train['TotalFlrSF_Derived'])
+
+#df_clean_norm_train['TotalBsmtSF'] = np.log(df_clean_norm_train['TotalBsmtSF'])
+df_clean_norm_train['LotFrontage'] = np.log(df_clean_norm_train['LotFrontage'])
+#df_clean_norm_train['MasVnrArea'] = np.log(df_clean_norm_train['MasVnrArea'])
+#df_clean_norm_train['TotalPorchSF_Derived'] = np.log(df_clean_norm_train['TotalPorchSF_Derived'])
+df_clean_norm_train['Age_Derived'] = np.log(df_clean_norm_train['Age_Derived'])
+
+
 
 X = df_clean_norm_train[features] 
 y = df_clean_norm_train[target]
 
 y = np.log(y)
+
+
 
 X_train, X_validation, y_train, y_validation = train_test_split(
     X, 
@@ -1907,6 +1985,7 @@ pd.DataFrame(result)
 #8.973959e-01
 
 #8.794422e-01 better test score
+#9.098070e-01
 
 
 # %%
@@ -2047,11 +2126,19 @@ pd.DataFrame(result)
 
 
 # %%
-
+df_clean_norm_test.loc[df_clean_norm_test['Age_Derived'].isnull(), :]
 
 
 # %%
+df_clean_norm_test['LotArea'] = np.log(df_clean_norm_test['LotArea'])
+df_clean_norm_test['TotalBldgSF_Derived'] = np.log(df_clean_norm_test['TotalBldgSF_Derived'])
+df_clean_norm_test['TotalFlrSF_Derived'] = np.log(df_clean_norm_test['TotalFlrSF_Derived'])
 
+#df_clean_norm_test['TotalBsmtSF'] = np.log(df_clean_norm_test['TotalBsmtSF'])
+df_clean_norm_test['LotFrontage'] = np.log(df_clean_norm_test['LotFrontage'])
+#df_clean_norm_test['MasVnrArea'] = np.log(df_clean_norm_test['MasVnrArea'])
+#df_clean_norm_test['TotalPorchSF_Derived'] = np.log(df_clean_norm_test['TotalPorchSF_Derived'])
+df_clean_norm_test['Age_Derived'] = np.log(df_clean_norm_test['Age_Derived'])
 
 
 # %%
@@ -2062,6 +2149,10 @@ X_test.loc[:, 'Id'] = df_clean_norm_test.loc[:, 'Id']
 
 #X_test.reset_index(drop=True, inplace=True)
 X_test.set_index("Id", drop=True, inplace=True)
+
+
+# %%
+
 
 
 # %%
@@ -2097,6 +2188,9 @@ with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writ
     df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
     df_clean_outlier_train.to_excel(writer, sheet_name='train_clean')
     df_clean_outlier_train_meta_sorted.to_excel(writer, sheet_name='train_clean_corr')
+
+    df_clean_norm_test.to_excel(writer, sheet_name='test_clean')
+    
     
     df_temp.to_excel(writer, sheet_name='temp')
 
