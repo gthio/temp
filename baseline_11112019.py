@@ -1295,18 +1295,10 @@ df_base_train
 # %%
 def data_numeric_encoding(df):
     
-    # numeric encoding - OverallQual
-    #df['OverallQual_Encoded'] = df['OverallQual'].map( 
-    #    {'0':4, '1':4, '2':4, '3':4, '4':4, '5':5, '6':6, '7':7, '8':8, '9':8, '10':8 })          
-    
     # numeric encoding - GarageQual
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
         {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
-    
-    # numeric encoding - GarageQual
-    #df['BsmtCond_Encoded'] = df['BsmtCond'].map( 
-    #    {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
-    
+
     # numeric encoding - BsmtExposure
     df['BsmtExposure_Encoded'] = df['BsmtExposure'].map( 
         {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1})  
@@ -1317,8 +1309,12 @@ def data_numeric_encoding(df):
     
     # numeric encoding - GarageQual
     df['GarageQual_Encoded'] = df['GarageQual'].map( 
-        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})    
+        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})   
     
+    # numeric encoding - GarageQual
+    df['GarageType_Encoded'] = df['GarageType'].map( 
+        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 0})
+        
     # numeric encoding - ExterQual
     df['ExterQual_Encoded'] = df['ExterQual'].map( 
         {'Ex':4, 'Gd':3, 'TA':2, 'Fa':2, 'Po':1, np.NaN: 2})
@@ -1354,13 +1350,6 @@ def data_numeric_encoding(df):
     # numeric encoding - LandSlope - XXX
     df['LandSlope_Encoded'] = df['LandSlope'].map( 
         {'Gtl':3, 'Mod':2, 'Sev':1, np.NaN:3})
-
-
-    
-    # numeric encoding - GarageQual
-    df['GarageType_Encoded'] = df['GarageType'].map( 
-        #{'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 1.1})    
-        {'BuiltIn':4, 'Attchd':3, 'Basment':2, '2Types':2, 'Detchd': 1, 'CarPort':1, np.NaN: 0})
     
     # numeric encoding - Foundation
     df['Foundation_Encoded'] = df['Foundation'].map( 
@@ -1376,14 +1365,18 @@ def data_numeric_encoding(df):
     
     # numeric encoding - MSZoning
     df['MSZoning_Encoded'] = df['MSZoning'].map( 
-        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 1 })     
+        {'FV':3, 'RL':3, 'RH':2, 'RM': 2, 'c(all)': 1, np.NaN: 3 })     
+    
+    # numeric encoding - OverallQual
+    #df['OverallQual_Encoded'] = df['OverallQual'].map( 
+    #    {'0':4, '1':4, '2':4, '3':4, '4':4, '5':5, '6':6, '7':7, '8':8, '9':8, '10':8 })          
+    
+    # numeric encoding - GarageQual
+    #df['BsmtCond_Encoded'] = df['BsmtCond'].map( 
+    #    {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
     
 data_numeric_encoding(df_base_train)
 data_numeric_encoding(df_base_test)
-
-
-# %%
-
 
 
 # %%
