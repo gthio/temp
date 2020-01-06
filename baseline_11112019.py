@@ -1337,7 +1337,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - KitchenQual
     df['KitchenQual_Encoded'] = df['KitchenQual'].map( 
-        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1})   
+        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN:2})   
     
     # numeric encoding - HeatingQC
     df['HeatingQC_Encoded'] = df['HeatingQC'].map( 
@@ -1345,15 +1345,15 @@ def data_numeric_encoding(df):
     
     # numeric encoding - Alley
     df['Alley_Encoded'] = df['Alley'].map( 
-        {'Pave':2, 'Grvl':1})    
+        {'Pave':2, 'Grvl':1, np.NaN:1})    
     
     # numeric encoding - LotShape
     df['LotShape_Encoded'] = df['LotShape'].map( 
-        {'Reg':2, 'IR1':1, 'IR2':1, 'IR3':1})
+        {'Reg':2, 'IR1':1, 'IR2':1, 'IR3':1, np.NaN:2})
 
     # numeric encoding - LandSlope - XXX
     df['LandSlope_Encoded'] = df['LandSlope'].map( 
-        {'Gtl':3, 'Mod':2, 'Sev':1})
+        {'Gtl':3, 'Mod':2, 'Sev':1, np.NaN:3})
 
 
     
@@ -1364,7 +1364,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - Foundation
     df['Foundation_Encoded'] = df['Foundation'].map( 
-        {'PConc':6, 'CBlock':5, 'BrkTil':4, 'Stone':3, 'Wood': 3,  'Slab':3 })
+        {'PConc':6, 'CBlock':5, 'BrkTil':4, 'Stone':3, 'Wood': 3,  'Slab':3, np.NaN: 6 })
     
     # numeric encoding - Foundation
     df['MasVnrType_Encoded'] = df['MasVnrType'].map( 
@@ -1398,70 +1398,12 @@ data_numeric_encoding(df_base_test)
     
 def data_numeric_encoding_missing(df):
     
-  
-    
-    # impute missing encoded data - LotShape_Econded
-    set_missing_data_with_freq_value(df, 'LotShape_Encoded')
-
-    # impute missing encoded data - Alley_Encoded
-    set_missing_data_with_freq_value(df, 'Alley_Encoded')
-
-    # impute missing encoded data - LandSlope_Encoded xxx
-    set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
-
-    # impute missing encoded data - KitchenQual_Encoded
-    set_missing_data_with_freq_value(df, 'KitchenQual_Encoded')
-
-
-
-    # impute missing encoded data - GarageCond_Encoded - XXX
-    ##set_missing_data_with_freq_value(df, 'GarageCond_Encoded')
-    
-    # impute missing encoded data - Foundation_Encoded
-    set_missing_data_with_value(df, 'GarageType_Encoded', 0)       
-    
-    # impute missing encoded data - PoolQC_Encoded
-    #set_missing_data_with_freq_value(df, 'PoolQC_Encoded')
-        
-
-        
-    # impute missing encoded data - Foundation_Encoded
-    set_missing_data_with_freq_value(df, 'Foundation_Encoded')        
-
     # impute missing encoded data - MSZoning
     set_missing_data_with_freq_value(df, 'MSZoning_Encoded')  
     
     # impute missing encoded data - MSZoning
     set_missing_data_with_freq_value(df, 'd_MSSubClass_Code')  
     
-    
-    
-    # impute missing encoded data - BsmtQual_Encoded
-    #set_missing_data_with_freq_value(df, 'BsmtQual_Encoded')
-
-    # impute missing encoded data - GarageCond_Encoded
-    ###set_missing_data_with_freq_value(df, 'BsmtCond_Encoded')
-
-    # impute missing encoded data - BsmtExposure_Encoded
-    #set_missing_data_with_freq_value(df, 'BsmtExposure_Encoded')
-    
-    # impute missing encoded data - LotShape_Econded
-    #set_missing_data_with_freq_value(df, 'GarageFinish_Encoded') 
-    
-    # impute missing encoded data - GarageQual_Encoded
-    #set_missing_data_with_freq_value(df, 'GarageQual_Encoded') 
-    
-    # impute missing encoded data - ExterQual_Encoded
-    #set_missing_data_with_freq_value(df, 'ExterQual_Encoded')
-
-    # impute missing encoded data - ExterCond_Encoded
-    #set_missing_data_with_freq_value(df, 'ExterCond_Encoded')  
-    
-    # impute missing encoded data - CentralAir_Encoded
-    #set_missing_data_with_freq_value(df, 'CentralAir_Encoded')
-
-    # impute missing encoded data - HeatingQC_Encoded
-    #set_missing_data_with_freq_value(df, 'HeatingQC_Encoded')
     
 data_numeric_encoding_missing(df_base_train)
 data_numeric_encoding_missing(df_base_test)
