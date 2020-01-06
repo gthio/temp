@@ -2,7 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
 
-
+#https://seaborn.pydata.org/tutorial/regression.html
 #https://www.kaggle.com/neviadomski/how-to-get-to-top-25-with-simple-model-sklearn
 
 
@@ -667,10 +667,10 @@ df_raw_train_meta.loc[df_raw_train_meta.index == attribute, :]
 #  6. **RoofStyle**: Type of roof (**Flat**: Flat, **Gable**: Gable, **Gambrel**: Gabrel (Barn), **Hip**: Hip, **Mansard**: Mansard, **Shed**: Shed)
 
 # %%
-attrs = ['ExterCond', 'ExterQual', 'Exterior1st', 'Exterior2nd', 
-         'Fence', 'RoofMatl', 'RoofStyle']
+attributes = ['ExterCond', 'ExterQual', 'Exterior1st', 'Exterior2nd', 
+              'Fence', 'RoofMatl', 'RoofStyle']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -689,16 +689,16 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  7. **GarageYrBlt**, year garage was built
 
 # %%
-attrs = ['GarageArea']
+attributes = ['GarageArea']
 
-plot_regplot_multiple(df_raw_train, attrs, target[0])
+plot_regplot_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-attrs = ['GarageCars', 'GarageQual', 'GarageCond', 'GarageFinish', 
-         'GarageType', 'GarageYrBlt']
+attributes = ['GarageCars', 'GarageQual', 'GarageCond', 'GarageFinish',
+              'GarageType', 'GarageYrBlt']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -718,15 +718,15 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 # 
 
 # %%
-attrs = ['BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2']
+attributes = ['BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-attrs = ['TotalBsmtSF', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF']
+attributes = ['TotalBsmtSF', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF']
 
-plot_regplot_multiple(df_raw_train, attrs, target[0])
+plot_regplot_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -739,9 +739,9 @@ plot_regplot_multiple(df_raw_train, attrs, target[0])
 #  2. **KitchenQual**, kitchen quality
 
 # %%
-attrs = ['KitchenAbvGr', 'KitchenQual']
+attributes = ['KitchenAbvGr', 'KitchenQual']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -755,15 +755,15 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  3. **GrLivArea**, Above grade (ground) living area square feet
 
 # %%
-attrs = ['Fireplaces', 'FireplaceQu']
+attributes = ['Fireplaces', 'FireplaceQu']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-attrs = ['GrLivArea']
+attributes = ['GrLivArea']
 
-plot_regplot_multiple(df_raw_train, attrs, target[0])
+plot_regplot_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -780,9 +780,10 @@ plot_regplot_multiple(df_raw_train, attrs, target[0])
 #  6. **BsmtHalfBath**, basement half bathrooms
 
 # %%
-attrs = ['BedroomAbvGr', 'TotRmsAbvGrd', 'FullBath', 'HalfBath', 'BsmtFullBath', 'BsmtHalfBath']
+attributes = ['BedroomAbvGr', 'TotRmsAbvGrd', 
+              'FullBath', 'HalfBath', 'BsmtFullBath', 'BsmtHalfBath']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -797,15 +798,15 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  4. **MiscVal**: $Value of miscellaneous feature
 
 # %%
-attrs = ['PoolArea', 'PoolQC', 'MiscFeature']
+attributes = ['PoolArea', 'PoolQC', 'MiscFeature']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-attrs = ['MiscVal']
+attributes = ['MiscVal']
 
-plot_regplot_multiple(df_raw_train, attrs, target[0])
+plot_regplot_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -816,14 +817,15 @@ plot_regplot_multiple(df_raw_train, attrs, target[0])
 #  ---
 #  1. **Electrical**: Electrical system
 #  2. **CentralAir**: Central air conditioning
-#  3. **Heating**: Type of heating
-#  4. **HeatingQC**: Heating quality and condition
-#  5. **Utilities**: Type of utilities available
+#  3. **Utilities**: Type of utilities available
+#  4. **Heating**: Type of heating
+#  5. **HeatingQC**: Heating quality and condition 
 
 # %%
-attrs = ['Electrical', 'CentralAir', 'Heating', 'HeatingQC', 'Utilities']
+attributes = ['Electrical', 'CentralAir', 'Utilities', 
+              'Heating', 'HeatingQC']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -836,9 +838,9 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  2. **OverallCond**, rates the overall condition of the house
 
 # %%
-attrs = ['OverallQual', 'OverallCond']
+attributes = ['OverallQual', 'OverallCond']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -866,9 +868,9 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 # 
 
 # %%
-attrs = ['BldgType', 'HouseStyle', 'Foundation', 'Functional', 'MasVnrType']
+attributes = ['BldgType', 'HouseStyle', 'Foundation', 'Functional', 'MasVnrType']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -892,15 +894,15 @@ plot_regplot_multiple(df_raw_train, attrs, target[0])
 # 
 
 # %%
-attrs = ['LotArea', 'LotFrontage']
+attributes = ['LotArea', 'LotFrontage']
 
-plot_regplot_multiple(df_raw_train, attrs, target[0])
+plot_regplot_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-attrs = ['LotShape', 'LotConfig']
+attributes = ['LotShape', 'LotConfig']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -918,10 +920,11 @@ plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
 #  7. **Condition2**, proximity to various conditions (if more than one is present)
 
 # %%
-attrs = ['Alley', 'PavedDrive', 'Street', 'LandContour', 'LandSlope', 
-         'Condition1', 'Condition2']
+attributes = ['Alley', 'PavedDrive', 'Street', 
+              'LandContour', 'LandSlope', 
+              'Condition1', 'Condition2']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
@@ -957,46 +960,23 @@ g.ax_joint.get_lines()[0].set_color('red')
 
 
 # %%
-#zzzzzzzzzz
+df = df_raw_train.groupby(['Neighborhood'])['SalePrice'].count().reset_index()
+df = df.sort_values(by=['SalePrice'], ascending=[False])
+lst = df['Neighborhood']
 
-def plot_regplot_zzzz(df, attribute, target):
-    
-    #sns.regplot(x=attribute, y=target, data=df)
-    fx, ax = plt.subplots(figsize=(10,6))
-    ax = sns.lmplot(x=attribute, y=target, data=df, hue='Neighborhood')
-    
+for area in lst:
+    fx, ax = plt.subplots(figsize=(8,6))
+    sns.regplot(x='LotArea', y='SalePrice', data=df_raw_train.loc[df_raw_train['Neighborhood'] == area])
     ticks = ax.get_yticks()
+    ax.set_title(area)
     ylabels = ['{:,.0f}'.format(x) for x in ticks]
-   
-    ax.set_yticklabels(ylabels)
-
-#dfx = df_raw_train.loc[df_raw_train['Neighborhood'] == 'CollgCr']    
-
-#plot_regplot_zzzz(df_raw_train, 'LotArea', target[0])
-#plot_regplot_zzzz(df_raw_train.loc[df_raw_train['Neighborhood'] == 'NAmes'], 'LotArea', target[0])
 
 
-#sns.regplot(x=attribute, y=target, data=df_raw_train)
+# %%
 
-
-fx, axs = plt.subplots(nrows=2)
-
-ax = sns.regplot(x='LotArea', y='SalePrice', ax=axs[0], data=df_raw_train.loc[df_raw_train['Neighborhood'] == 'CollgCr'])
-ticks = ax.get_yticks()
-ylabels = ['{:,.0f}'.format(x) for x in ticks]
-ax.set_yticklabels(ylabels)
-
-ax = sns.regplot(x='LotArea', y='SalePrice', ax=axs[1], data=df_raw_train.loc[df_raw_train['Neighborhood'] == 'NAmes'])
-ticks = ax.get_yticks()
-ylabels = ['{:,.0f}'.format(x) for x in ticks]
-ax.set_yticklabels(ylabels)
-
-
-
-    
 
 # %% [markdown]
-#  ### Sell condition
+#  ### Sale condition
 #  ---
 #  1. **SaleType**, type of sale
 #  2. **SaleCondition**, condition of sale
@@ -1006,19 +986,25 @@ ax.set_yticklabels(ylabels)
 # 
 
 # %%
-attrs = ['SaleType', 'SaleCondition', 'YrSold', 'MoSold']
+attributes = ['SaleType', 'SaleCondition', 'YrSold', 'MoSold']
 
-plot_attribute_categorical_multiple(df_raw_train, attrs, target[0])
+plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
+
+
+# %%
+
+
+
+# %%
+with pd.ExcelWriter('output_raw.xlsx') as writer:
+    df_raw_train.to_excel(writer, sheet_name='train')
+    df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
+    df_raw_test.to_excel(writer, sheet_name='test')
+    df_raw_test_meta.to_excel(writer, sheet_name='test_meta')
 
 
 # %%
 
-
-
-# %%
-#with pd.ExcelWriter('output.xlsx') as writer:
-#    df_raw_train.to_excel(writer, sheet_name='train')
-#    df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
 
 # %% [markdown]
 #  ## Data as it is - numeric correlation
@@ -1057,11 +1043,7 @@ df_raw_train_meta_sorted.head(
 plot_pca_smarter(df_raw_train, 
     df_raw_train_meta_sorted, 
     target, 
-    14)
-
-
-# %%
-#https://seaborn.pydata.org/tutorial/regression.html
+    15)
 
 
 # %%
@@ -1118,41 +1100,37 @@ df_base_test = df_raw_test.copy(deep=True)
 
 def data_missing_handler(df):
 
-    # set MasVnrArea 0 if its null
+    # set area to 0 if its null
     set_missing_data_with_value(df, 'MasVnrArea', 0)
-
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'GarageCars', 0)    
-
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'FullBath', 0)
-    set_missing_data_with_value(df, 'BsmtFullBath', 0)
-    set_missing_data_with_value(df, 'HalfBath', 0)
-    set_missing_data_with_value(df, 'BsmtHalfBath', 0)
-    
-    # set MasVnrArea 0 if its null
-    set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
-    set_missing_data_with_value(df, 'TotalBsmtSF', 0)
-    
-    # set MasVnrArea 0 if its null
     set_missing_data_with_value(df, '1stFlrSF', 0)
     set_missing_data_with_value(df, '2ndFlrSF', 0)
-    
+    set_missing_data_with_value(df, 'BsmtUnfSF', 0) 
+    set_missing_data_with_value(df, 'TotalBsmtSF', 0)    
     set_missing_data_with_value(df, 'OpenPorchSF', 0)    
     set_missing_data_with_value(df, 'EnclosedPorch', 0)    
     set_missing_data_with_value(df, '3SsnPorch', 0)    
     set_missing_data_with_value(df, 'ScreenPorch', 0)    
     set_missing_data_with_value(df, 'WoodDeckSF', 0)
-    
+
+    # set count to 0 if its null
+    set_missing_data_with_value(df, 'GarageCars', 0)    
+    set_missing_data_with_value(df, 'FullBath', 0)
+    set_missing_data_with_value(df, 'BsmtFullBath', 0)
+    set_missing_data_with_value(df, 'HalfBath', 0)
+    set_missing_data_with_value(df, 'BsmtHalfBath', 0)
+ 
+    # set lot frontage to percentage of lot size
+    df.loc[df['LotFrontage'].isnull(), 
+           'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
+
+    # set GarageYrBlt to entire house YearBuilt if its null
+    df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
+       
+    # set year and month sold to some number if its null
     set_missing_data_with_value(df, 'YrSold', 2010)
     set_missing_data_with_value(df, 'MoSold', 4)
     
-
-    df.loc[df['LotFrontage'].isnull(), 'LotFrontage'] = df.loc[df['LotFrontage'].isnull(), 'LotArea'] * 0.0025
     
-    # set GarageYrBlt to YearBuilt if its null
-    df.loc[df['GarageYrBlt'].isnull(), ['GarageYrBlt']] = df['YearBuilt']
-
 data_missing_handler(df_base_train)
 data_missing_handler(df_base_test)
 
@@ -1804,7 +1782,7 @@ plot_pca_smarter(df_clean_norm_train, df_clean_norm_train_meta_sorted, target, 1
 #  [feature_selection](https://machinelearningmastery.com/feature-selection-machine-learning-python/)
 
 # %%
-model_number_of_features = 38
+model_number_of_features = 40
 
 
 # %%
@@ -1986,6 +1964,7 @@ pd.DataFrame(result)
 
 #8.794422e-01 better test score
 #9.098070e-01
+#9.113324e-01
 
 
 # %%
