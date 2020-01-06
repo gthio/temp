@@ -1779,6 +1779,12 @@ model_cv = 5
 
 
 # %%
+# clone previous df to this section df
+df_model_train = df_clean_norm_train.copy(deep=True)
+df_model_test = df_clean_norm_test.copy(deep=True)
+
+
+# %%
 # get model features, from the top x attributes with highest k-best score
 features = df_attribute_scores.iloc[0:model_number_of_features].sort_values(
     by='kbest', ascending=False)['attribute']
@@ -1788,20 +1794,20 @@ features
 
 # %%
 # allocate data for training and validation works
-df_clean_norm_train['LotArea'] = np.log(df_clean_norm_train['LotArea'])
-df_clean_norm_train['TotalBldgSF_Derived'] = np.log(df_clean_norm_train['TotalBldgSF_Derived'])
-df_clean_norm_train['TotalFlrSF_Derived'] = np.log(df_clean_norm_train['TotalFlrSF_Derived'])
+df_model_train['LotArea'] = np.log(df_model_train['LotArea'])
+df_model_train['TotalBldgSF_Derived'] = np.log(df_model_train['TotalBldgSF_Derived'])
+df_model_train['TotalFlrSF_Derived'] = np.log(df_model_train['TotalFlrSF_Derived'])
 
-#df_clean_norm_train['TotalBsmtSF'] = np.log(df_clean_norm_train['TotalBsmtSF'])
-df_clean_norm_train['LotFrontage'] = np.log(df_clean_norm_train['LotFrontage'])
-#df_clean_norm_train['MasVnrArea'] = np.log(df_clean_norm_train['MasVnrArea'])
-#df_clean_norm_train['TotalPorchSF_Derived'] = np.log(df_clean_norm_train['TotalPorchSF_Derived'])
-df_clean_norm_train['Age_Derived'] = np.log(df_clean_norm_train['Age_Derived'])
+#df_model_train['TotalBsmtSF'] = np.log(df_model_train['TotalBsmtSF'])
+df_model_train['LotFrontage'] = np.log(df_model_train['LotFrontage'])
+#df_model_train['MasVnrArea'] = np.log(df_model_train['MasVnrArea'])
+#df_model_train['TotalPorchSF_Derived'] = np.log(df_model_train['TotalPorchSF_Derived'])
+df_model_train['Age_Derived'] = np.log(df_model_train['Age_Derived'])
 
 
 
-X = df_clean_norm_train[features] 
-y = df_clean_norm_train[target]
+X = df_model_train[features] 
+y = df_model_train[target]
 
 y = np.log(y)
 
@@ -1940,7 +1946,7 @@ df_temp2b.head(5)
 
 # %%
 df_temp = pd.concat([df_temp2a,df_temp2b], axis=0)
-df_temp = df_clean_norm_train.merge(df_temp, left_index=True, right_index=True, how='outer')
+df_temp = df_model_train.merge(df_temp, left_index=True, right_index=True, how='outer')
 df_temp
 
 
@@ -2054,26 +2060,26 @@ pd.DataFrame(result)
 
 
 # %%
-df_clean_norm_test.loc[df_clean_norm_test['Age_Derived'].isnull(), :]
+df_model_test.loc[df_model_test['Age_Derived'].isnull(), :]
 
 
 # %%
-df_clean_norm_test['LotArea'] = np.log(df_clean_norm_test['LotArea'])
-df_clean_norm_test['TotalBldgSF_Derived'] = np.log(df_clean_norm_test['TotalBldgSF_Derived'])
-df_clean_norm_test['TotalFlrSF_Derived'] = np.log(df_clean_norm_test['TotalFlrSF_Derived'])
+df_model_test['LotArea'] = np.log(df_model_test['LotArea'])
+df_model_test['TotalBldgSF_Derived'] = np.log(df_model_test['TotalBldgSF_Derived'])
+df_model_test['TotalFlrSF_Derived'] = np.log(df_model_test['TotalFlrSF_Derived'])
 
-#df_clean_norm_test['TotalBsmtSF'] = np.log(df_clean_norm_test['TotalBsmtSF'])
-df_clean_norm_test['LotFrontage'] = np.log(df_clean_norm_test['LotFrontage'])
-#df_clean_norm_test['MasVnrArea'] = np.log(df_clean_norm_test['MasVnrArea'])
-#df_clean_norm_test['TotalPorchSF_Derived'] = np.log(df_clean_norm_test['TotalPorchSF_Derived'])
-df_clean_norm_test['Age_Derived'] = np.log(df_clean_norm_test['Age_Derived'])
+#df_model_test['TotalBsmtSF'] = np.log(df_model_test['TotalBsmtSF'])
+df_model_test['LotFrontage'] = np.log(df_model_test['LotFrontage'])
+#df_model_test['MasVnrArea'] = np.log(df_model_test['MasVnrArea'])
+#df_model_test['TotalPorchSF_Derived'] = np.log(df_model_test['TotalPorchSF_Derived'])
+df_model_test['Age_Derived'] = np.log(df_model_test['Age_Derived'])
 
 
 # %%
 # ... test data
 
-X_test = df_clean_norm_test[features]
-X_test.loc[:, 'Id'] = df_clean_norm_test.loc[:, 'Id']
+X_test = df_model_test[features]
+X_test.loc[:, 'Id'] = df_model_test.loc[:, 'Id']
 
 #X_test.reset_index(drop=True, inplace=True)
 X_test.set_index("Id", drop=True, inplace=True)
