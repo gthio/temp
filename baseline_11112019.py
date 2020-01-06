@@ -996,7 +996,9 @@ plot_attribute_categorical_multiple(df_raw_train, attributes, target[0])
 
 
 # %%
-with pd.ExcelWriter('output_raw.xlsx') as writer:
+now = datetime.now()
+
+with pd.ExcelWriter('output_raw_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writer:
     df_raw_train.to_excel(writer, sheet_name='train')
     df_raw_train_meta.to_excel(writer, sheet_name='train_meta')
     df_raw_test.to_excel(writer, sheet_name='test')
@@ -1152,34 +1154,28 @@ def data_derive_attributes(df):
 
     # just take the age as renovation age
     df['Age_Derived'] = df['RemodAge_Derived']
+    df.loc[df['Age_Derived'] <= 0, 'Age_Derived'] = 0.1
         
-    df['Fireplace_Has_Derived'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)    
+    df['Garage_Has_Derived'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
     df['HasPool_Has_Derived'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
+    df['Fireplace_Has_Derived'] = df['Fireplaces'].apply(lambda x: 1 if x > 0 else 0)    
+    df['Bsmt_Has_Derived'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
+    df['2ndFlr_Has_Derived'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
     
     df['Bath_Derived'] = df['FullBath'] + df['BsmtFullBath'] + (0.5 * df['HalfBath']) + (0.5 * df['BsmtHalfBath'])
     df['TotalPorchSF_Derived'] = df['OpenPorchSF'] + df['EnclosedPorch'] + df['3SsnPorch'] + df['ScreenPorch'] + df['WoodDeckSF'] 
-    # total floor sqf
-
-    df['Garage_Has_Derived'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
-    
-    
-    df['Bsmt_Has_Derived'] = df['TotalBsmtSF'].apply(lambda x: 1 if x > 0 else 0)
-    df['2ndFlr_Has_Derived'] = df['2ndFlrSF'].apply(lambda x: 1 if x > 0 else 0)
     
     df['TotalFlrSF_Derived'] = df['1stFlrSF'] + df['2ndFlrSF']
     df['TotalBldgSF_Derived'] = df['1stFlrSF'] + df['2ndFlrSF'] + df['TotalBsmtSF']
     df['GardenSF_Derived'] = df['LotArea'] - df['1stFlrSF']
-    
-    
-    df.loc[df['Age_Derived'] <= 0, 'Age_Derived'] = 0.1
-    
-    
+        
+        
 data_derive_attributes(df_base_train) 
 data_derive_attributes(df_base_test) 
 
 
 # %%
-df_base_test.loc[df_base_test['Age_Derived'] > 0.0001, ['Age_Derived', 'HouseAge_Derived', 'RemodAge_Derived']]
+
 
 
 # %%
@@ -1220,6 +1216,10 @@ df_base_test = pd.merge(df_base_test,
     how='inner', 
     left_on='Neighborhood', 
     right_on='Neighborhood') 
+
+
+# %%
+df_neighborhood_code
 
 
 # %%
@@ -1303,21 +1303,33 @@ def data_numeric_encoding(df):
     df['BsmtQual_Encoded'] = df['BsmtQual'].map( 
         {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
     
+    # numeric encoding - GarageQual
+    #df['BsmtCond_Encoded'] = df['BsmtCond'].map( 
+    #    {'Ex':5, 'Gd':4, 'TA':3, 'Fa':2, 'Po':1, np.NaN:2})
+    
     # numeric encoding - BsmtExposure
     df['BsmtExposure_Encoded'] = df['BsmtExposure'].map( 
-        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1})         
+        {'Ex':5, 'Gd':4, 'Av':3, 'Mn':2, 'No':1, np.NaN:1})  
+    
+    # numeric encoding - GarageFinish
+    df['GarageFinish_Encoded'] = df['GarageFinish'].map( 
+        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 2})    
+    
+    # numeric encoding - GarageQual
+    df['GarageQual_Encoded'] = df['GarageQual'].map( 
+        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})    
     
     # numeric encoding - ExterQual
     df['ExterQual_Encoded'] = df['ExterQual'].map( 
-        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':2, 'Po':1})
+        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':2, 'Po':1, np.NaN: 2})
 
     # numeric encoding - ExterCond
     df['ExterCond_Encoded'] = df['ExterCond'].map( 
-        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1})
+        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1, np.NaN: 3})
        
     # numeric encoding - CentralAir
     df['CentralAir_Encoded'] = df['CentralAir'].map( 
-        {'Y':2, 'N':1})   
+        {'Y':2, 'N':1, np.NaN: 2})   
     
     # numeric encoding - CentralAir
     df['Electrical_Encoded'] = df['Electrical'].map( 
@@ -1329,7 +1341,7 @@ def data_numeric_encoding(df):
     
     # numeric encoding - HeatingQC
     df['HeatingQC_Encoded'] = df['HeatingQC'].map( 
-        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1})   
+        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN:2})   
     
     # numeric encoding - Alley
     df['Alley_Encoded'] = df['Alley'].map( 
@@ -1343,13 +1355,7 @@ def data_numeric_encoding(df):
     df['LandSlope_Encoded'] = df['LandSlope'].map( 
         {'Gtl':3, 'Mod':2, 'Sev':1})
 
-    # numeric encoding - GarageFinish
-    df['GarageFinish_Encoded'] = df['GarageFinish'].map( 
-        {'Fin':3, 'RFn':2, 'Unf':1, np.NaN: 2})    
-    
-    # numeric encoding - GarageQual
-    df['GarageQual_Encoded'] = df['GarageQual'].map( 
-        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})
+
     
     # numeric encoding - GarageQual
     df['GarageType_Encoded'] = df['GarageType'].map( 
@@ -1392,8 +1398,7 @@ data_numeric_encoding(df_base_test)
     
 def data_numeric_encoding_missing(df):
     
-    # impute missing encoded data - LotShape_Econded
-    set_missing_data_with_freq_value(df, 'GarageFinish_Encoded')    
+  
     
     # impute missing encoded data - LotShape_Econded
     set_missing_data_with_freq_value(df, 'LotShape_Encoded')
@@ -1404,17 +1409,10 @@ def data_numeric_encoding_missing(df):
     # impute missing encoded data - LandSlope_Encoded xxx
     set_missing_data_with_freq_value(df, 'LandSlope_Encoded')
 
-    # impute missing encoded data - CentralAir_Encoded
-    set_missing_data_with_freq_value(df, 'CentralAir_Encoded')
-
-    # impute missing encoded data - HeatingQC_Encoded
-    set_missing_data_with_freq_value(df, 'HeatingQC_Encoded')
-
     # impute missing encoded data - KitchenQual_Encoded
     set_missing_data_with_freq_value(df, 'KitchenQual_Encoded')
 
-    # impute missing encoded data - GarageQual_Encoded
-    set_missing_data_with_freq_value(df, 'GarageQual_Encoded')
+
 
     # impute missing encoded data - GarageCond_Encoded - XXX
     ##set_missing_data_with_freq_value(df, 'GarageCond_Encoded')
@@ -1422,23 +1420,10 @@ def data_numeric_encoding_missing(df):
     # impute missing encoded data - Foundation_Encoded
     set_missing_data_with_value(df, 'GarageType_Encoded', 0)       
     
-    # impute missing encoded data - BsmtQual_Encoded
-    set_missing_data_with_freq_value(df, 'BsmtQual_Encoded')
-
-    # impute missing encoded data - GarageCond_Encoded
-    ##set_missing_data_with_freq_value(df, 'BsmtCond_Encoded')
-
-    # impute missing encoded data - BsmtExposure_Encoded
-    set_missing_data_with_freq_value(df, 'BsmtExposure_Encoded')
-    
     # impute missing encoded data - PoolQC_Encoded
     #set_missing_data_with_freq_value(df, 'PoolQC_Encoded')
         
-    # impute missing encoded data - ExterQual_Encoded
-    set_missing_data_with_freq_value(df, 'ExterQual_Encoded')
 
-    # impute missing encoded data - ExterCond_Encoded
-    set_missing_data_with_freq_value(df, 'ExterCond_Encoded')
         
     # impute missing encoded data - Foundation_Encoded
     set_missing_data_with_freq_value(df, 'Foundation_Encoded')        
@@ -1448,6 +1433,35 @@ def data_numeric_encoding_missing(df):
     
     # impute missing encoded data - MSZoning
     set_missing_data_with_freq_value(df, 'd_MSSubClass_Code')  
+    
+    
+    
+    # impute missing encoded data - BsmtQual_Encoded
+    #set_missing_data_with_freq_value(df, 'BsmtQual_Encoded')
+
+    # impute missing encoded data - GarageCond_Encoded
+    ###set_missing_data_with_freq_value(df, 'BsmtCond_Encoded')
+
+    # impute missing encoded data - BsmtExposure_Encoded
+    #set_missing_data_with_freq_value(df, 'BsmtExposure_Encoded')
+    
+    # impute missing encoded data - LotShape_Econded
+    #set_missing_data_with_freq_value(df, 'GarageFinish_Encoded') 
+    
+    # impute missing encoded data - GarageQual_Encoded
+    #set_missing_data_with_freq_value(df, 'GarageQual_Encoded') 
+    
+    # impute missing encoded data - ExterQual_Encoded
+    #set_missing_data_with_freq_value(df, 'ExterQual_Encoded')
+
+    # impute missing encoded data - ExterCond_Encoded
+    #set_missing_data_with_freq_value(df, 'ExterCond_Encoded')  
+    
+    # impute missing encoded data - CentralAir_Encoded
+    #set_missing_data_with_freq_value(df, 'CentralAir_Encoded')
+
+    # impute missing encoded data - HeatingQC_Encoded
+    #set_missing_data_with_freq_value(df, 'HeatingQC_Encoded')
     
 data_numeric_encoding_missing(df_base_train)
 data_numeric_encoding_missing(df_base_test)
@@ -2163,6 +2177,7 @@ with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writ
     df_raw_test_meta.to_excel(writer, sheet_name='raw_test_meta')
     df_raw_train_meta_sorted.to_excel(writer, sheet_name='raw_train_meta_corr')
     
+    df_neighborhood_code.to_excel(writer, sheet_name='asdfasdf')
     df_base_train.to_excel(writer, sheet_name='train_base')
     df_base_train_meta_sorted.to_excel(writer, sheet_name='train_base_corr')
     df_clean_outlier_train.to_excel(writer, sheet_name='train_clean')
