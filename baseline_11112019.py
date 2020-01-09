@@ -1309,7 +1309,11 @@ def data_numeric_encoding(df):
     
     # numeric encoding - GarageQual
     df['GarageQual_Encoded'] = df['GarageQual'].map( 
-        {'Ex':3, 'Gd':3, 'TA':2, 'Fa':1, 'Po':1, np.NaN: 0})   
+        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1, np.NaN: 3})   
+
+    # numeric encoding - GarageCond
+    df['GarageCond_Encoded'] = df['GarageCond'].map( 
+        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1, np.NaN: 3})       
     
     # numeric encoding - GarageQual
     df['GarageType_Encoded'] = df['GarageType'].map( 
@@ -1919,7 +1923,7 @@ pd.DataFrame(result)
 
 #8.794422e-01 better test score
 #9.098070e-01
-#9.113324e-01
+#9.147213e-01
 
 
 # %%
