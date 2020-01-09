@@ -568,7 +568,7 @@ target = ['SalePrice']
 variable_ignored = ['Id']
 
 # variable - year month list
-variable_year_month = ['YearBuilt', 'YearRemodAdd', 'YrSold', 'MoSold']
+variable_year_month = ['YearRemodAdd', 'YrSold', 'MoSold']  #'YearBuilt', 
 
 
 # %%
@@ -1317,7 +1317,7 @@ def data_numeric_encoding(df):
         
     # numeric encoding - ExterQual
     df['ExterQual_Encoded'] = df['ExterQual'].map( 
-        {'Ex':4, 'Gd':3, 'TA':2, 'Fa':2, 'Po':1, np.NaN: 2})
+        {'Ex':4, 'Gd':3, 'TA':3, 'Fa':2, 'Po':1, np.NaN: 3})
 
     # numeric encoding - ExterCond
     df['ExterCond_Encoded'] = df['ExterCond'].map( 
@@ -1409,7 +1409,7 @@ data_numeric_encoding_missing(df_base_test)
 
 exclusions = [#'Id', 
     'HouseAge_Derived', 'RemodAge_Derived',
-    'YrSold', 'MoSold', 'YearBuilt', 'YearRemodAdd', 
+    'YrSold', 'MoSold',  'YearRemodAdd', #'YearBuilt',
     'GarageArea', 'GarageYrBlt',
 
     'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'WoodDeckSF',
@@ -1771,7 +1771,7 @@ plot_pca_smarter2(df_clean_norm_train,
 model_validation_size = 0.25
 model_seed = 8
 
-model_iteration_max = 2500
+model_iteration_max = 1000
 model_tollerance = 0.0005
 model_alpha = 0.1
 
