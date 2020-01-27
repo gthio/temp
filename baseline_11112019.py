@@ -2,21 +2,6 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
 
-#https://seaborn.pydata.org/tutorial/regression.html
-#https://www.kaggle.com/neviadomski/how-to-get-to-top-25-with-simple-model-sklearn
-
-
-# %%
-#https://medium.com/@datalesdatales/why-you-should-be-plotting-learning-curves-in-your-next-machine-learning-project-221bae60c53
-
-
-#plot_attribute_categorical_original(df_raw_train, target[0], 'ExterQual')
-
-#https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
-#https://python-graph-gallery.com/10-barplot-with-number-of-observation/
-#https://matplotlib.org/3.1.0/gallery/statistics/barchart_demo.html#sphx-glr-gallery-statistics-barchart-demo-py
-
-#    #https://matplotlib.org/mpl-probscale/tutorial/closer_look_at_viz.html
 
 # %% [markdown]
 #  # Problem formulation
@@ -101,7 +86,7 @@ np.random.seed(0)
 # %%
 # get dataframe meta data
 
-def get_meta_data(df):
+def get_dataframe_metadata(df):
     
     # get column's datatype
     temp1 = pd.DataFrame({'dtype': df.dtypes}).T
@@ -116,13 +101,27 @@ def get_meta_data(df):
 
 
 # %%
+# get dataframe stat (metadata)
+
+def get_dataframe_stat(df):
+    
+    # get and set dataframe's metadata
+    df_meta = get_dataframe_metadata(df)
+
+    # set stat info for each attribute
+    set_dataframe_stat(df, df_meta)
+
+    return df_meta
+
+
+# %%
 # for x attribute, get missing data info (number of non-null, null and pct of null)
 
-def get_stat_null(x, df_data):
+def get_dataframe_stat_null(df, x):
     
     col = x.name
-    count_null = df_data[col].isnull().sum()
-    count_notnull = df_data[col].notnull().sum()
+    count_null = df[col].isnull().sum()
+    count_notnull = df[col].notnull().sum()
     pct_null = count_null / (count_null + count_notnull)
 
     return [count_notnull, count_null, pct_null]
@@ -131,11 +130,11 @@ def get_stat_null(x, df_data):
 # %%
 # for x attribute, get count of unique values and list of unique values
 
-def get_stat_uniqueness(x, df_data):
+def get_dataframe_stat_uniqueness(df, x):
     
     col = x.name
-    count = len(df_data[col].dropna())
-    uniques = df_data[col].dropna().unique()
+    count = len(df[col].dropna())
+    uniques = df[col].dropna().unique()
     
     flatten = '...'
     unique_count = len(uniques) #float('nan')
@@ -150,7 +149,7 @@ def get_stat_uniqueness(x, df_data):
 # %%
 # for x attribute, get attribute's skewness and kurtosis
 
-def get_stat(x, df_data):
+def get_dataframe_stat_skew(df, x):
     
     col = x.name
     
@@ -158,8 +157,8 @@ def get_stat(x, df_data):
     kurtosis = float('nan')
 
     if ((x['dtype'] == 'int64') | (x['dtype'] == 'float64')):
-        skewness = df_data[col].skew()
-        kurtosis = df_data[col].kurtosis()
+        skewness = df[col].skew()
+        kurtosis = df[col].kurtosis()
         
     return [skewness, kurtosis]
 
@@ -167,7 +166,7 @@ def get_stat(x, df_data):
 # %%
 # get each attribute's 3rd, 2nd and 1st quartile deviation
 
-def get_stat_quart(x):
+def get_dataframe_stat_quart(x):
     
     col = x.name
     
@@ -193,19 +192,19 @@ def get_stat_quart(x):
 # %%
 # set each attribute's stats
 
-def set_stat(df_data, df_meta):
+def set_dataframe_stat(df_data, df_meta):
     
     # set missing data info for each attribute
     df_meta[['notnull_count', 'null_count', 'null_pct']] = df_meta.loc[:, :].apply(
-        lambda x: get_stat_null(x, df_data), axis=1, result_type="expand")
+        lambda x: get_dataframe_stat_null(df_data, x), axis=1, result_type="expand")
 
     # set each attribute's uniqueness data
     df_meta[['unique_count', 'unique_values']] = df_meta.loc[:, :].apply(
-        lambda x: get_stat_uniqueness(x, df_data), axis=1, result_type="expand")
+        lambda x: get_dataframe_stat_uniqueness(df_data, x), axis=1, result_type="expand")
 
     # set each attribute's statistic value (ie. skew and kurtosis)
     df_meta[['skew', 'kurtosis']] = df_meta.loc[:, :].apply(
-        lambda x: get_stat(x, df_data), axis=1, result_type="expand")
+        lambda x: get_dataframe_stat_skew(df_data, x), axis=1, result_type="expand")
 
     # set each attribute's 3rd, 2nd and 1st quartile deviation
     df_meta[['lower_3s_1', 'upper_3s_1', 
@@ -213,22 +212,8 @@ def set_stat(df_data, df_meta):
              'lower_3s_3', 'upper_3s_3',
              'lower_3s_4', 'upper_3s_4',
              'lower_3s_5', 'upper_3s_5']] = df_meta.loc[:, :].apply(
-        lambda x: get_stat_quart(x), axis=1, result_type="expand")
+        lambda x: get_dataframe_stat_quart(x), axis=1, result_type="expand")
     
-
-
-# %%
-# get dataframe stat (metadata)
-
-def get_dataframe_metadata(df):
-    
-    # get and set dataframe's metadata
-    df_meta = get_meta_data(df)
-
-    # set stat info for each attribute
-    set_stat(df, df_meta)
-
-    return df_meta
 
 
 # %%
@@ -248,6 +233,18 @@ def compute_correlation_matrix(df, target, attributes):
     result = temp1.loc[:, temp2]
     
     return result
+
+
+# %%
+# plot correlations
+
+def plot_correlation_matrix(df_corr):
+    
+    mask = np.zeros_like(df_corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+    
+    f, ax = plt.subplots(figsize=(20, 20))
+    sns.heatmap(df_corr, linewidths=.10, annot=False, mask=mask, fmt='.2g', cmap="PiYG");
 
 
 # %%
@@ -288,19 +285,6 @@ def plot_pca_smarter(df, df_meta, target, number_of_attributes):
 def plot_pca_smarter2(df, df_meta, target, attributes):
 
     cols_1d = plot_pca(df, target, attributes)
-    
-
-
-# %%
-# plot correlations
-
-def plot_correlation_matrix(df_corr):
-    
-    mask = np.zeros_like(df_corr, dtype=np.bool)
-    mask[np.triu_indices_from(mask)] = True
-    
-    f, ax = plt.subplots(figsize=(20, 20))
-    sns.heatmap(df_corr, linewidths=.10, annot=False, mask=mask, fmt='.2g', cmap="PiYG");
     
 
 
@@ -497,16 +481,6 @@ def plot_attribute_categorical_multiple(df_o, attributes, target):
 
 
 # %%
-def plot_attribute_categorical_original(df, target, attribute):
-    fig, ax = plt.subplots(1, 2, figsize=(20, 5))
-
-    sns.catplot(x=attribute, y=target, kind='bar', data=df_raw_train.fillna('MISSING!!'), ax=ax[0])
-    sns.countplot(df_raw_train[attribute].fillna('MISSING!!'), ax=ax[1])
-    plt.close(2)
-    plt.show()
-
-
-# %%
 def plot_regplot(df, attribute, target):
     
     #sns.regplot(x=attribute, y=target, data=df)
@@ -620,13 +594,13 @@ df_raw_test.head(config_df_row_count)
 
 # %%
 # get train data metadata
-df_raw_train_meta = get_dataframe_metadata(df_raw_train)
+df_raw_train_meta = get_dataframe_stat(df_raw_train)
 df_raw_train_meta.head(config_df_row_count)
 
 
 # %%
 # get test data metadata
-df_raw_test_meta = get_dataframe_metadata(df_raw_test)
+df_raw_test_meta = get_dataframe_stat(df_raw_test)
 df_raw_test_meta.head(config_df_row_count)
 
 
@@ -1154,7 +1128,7 @@ def data_derive_attributes(df):
 
     # just take the age as renovation age
     df['Age_Derived'] = df['RemodAge_Derived']
-    df.loc[df['Age_Derived'] <= 0, 'Age_Derived'] = 0.1
+    df.loc[df['Age_Derived'] <= 0, 'Age_Derived'] = 0.6
         
     df['Garage_Has_Derived'] = df['GarageArea'].apply(lambda x: 1 if x > 0 else 0)
     df['HasPool_Has_Derived'] = df['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
@@ -1442,7 +1416,7 @@ df_base_test = df_base_test.drop(exclusions, axis=1, errors='ignore')
 
 # %%
 # get dataframe's metadata
-df_base_train_meta = get_dataframe_metadata(df_base_train)
+df_base_train_meta = get_dataframe_stat(df_base_train)
 
 df_base_train_meta.head(config_df_row_correlation_count)
 
@@ -1524,7 +1498,7 @@ df_clean_outlier_train = df_clean_outlier_train.loc[df_clean_outlier_train['Outl
 
 # %%
 # get dataframe's metadata
-df_clean_outlier_train_meta = get_dataframe_metadata(df_clean_outlier_train)
+df_clean_outlier_train_meta = get_dataframe_stat(df_clean_outlier_train)
 
 df_clean_outlier_train_meta.head(config_df_row_count)
 
@@ -1674,7 +1648,7 @@ data_standardize(df_clean_norm_test, numeric_attributes)
 
 # %%
 # get dataframe's metadata
-df_clean_norm_train_meta = get_dataframe_metadata(df_clean_norm_train)
+df_clean_norm_train_meta = get_dataframe_stat(df_clean_norm_train)
 
 df_clean_norm_train_meta.head(config_df_row_count)
 
@@ -2136,6 +2110,17 @@ with pd.ExcelWriter('output_' + now.strftime("%d%m%Y_%H%M%S") + '.xlsx') as writ
 
 # %%
 
+#https://medium.com/@datalesdatales/why-you-should-be-plotting-learning-curves-in-your-next-machine-learning-project-221bae60c53
+
+
+#https://seaborn.pydata.org/tutorial/regression.html
+#https://www.kaggle.com/neviadomski/how-to-get-to-top-25-with-simple-model-sklearn
+
+#https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
+#https://python-graph-gallery.com/10-barplot-with-number-of-observation/
+#https://matplotlib.org/3.1.0/gallery/statistics/barchart_demo.html#sphx-glr-gallery-statistics-barchart-demo-py
+
+#    #https://matplotlib.org/mpl-probscale/tutorial/closer_look_at_viz.html
 
 
 # %%
