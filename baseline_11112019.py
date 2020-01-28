@@ -1399,7 +1399,7 @@ exclusions = [#'Id',
 
     'MiscFeature', 'MiscVal', 
     
-    'TotRmsAbvGrd', 'GrLivArea',
+    'TotRmsAbvGrd', #'GrLivArea',
     
     'MSSubClass'
     
@@ -1898,6 +1898,7 @@ pd.DataFrame(result)
 #8.794422e-01 better test score
 #9.098070e-01
 #9.147213e-01
+#9.134525e-01
 
 
 # %%
